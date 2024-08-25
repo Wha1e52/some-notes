@@ -28,6 +28,8 @@ cp - Copy one or more files to another location
 
 cat - Concatenate and print (display) the content of files
 
+cat > file.txt - redirect output to file
+
 less - Display output
 head - Output the first part of file
 tail - Output the last part of a file

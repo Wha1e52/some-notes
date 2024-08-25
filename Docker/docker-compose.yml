@@ -20,6 +20,8 @@ services:
     # depends_on не ожидает старта самого процесса, лишь указывает порядок запуска контейнеров
     depends_on:
       - db
+    networks:
+      - backend
 
   db:
     # какой образ использовать
@@ -37,6 +39,15 @@ services:
     # создаем маппинг томов(в данном случае, созданную папку в докере с папкой в контейнере)
     volumes:
       - db_data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+
 # создаем папку для хранения данных на виртуальной машине докера
 volumes:
   db_data:
+
+# создаем сети
+networks:
+  frontend:
+  backend:

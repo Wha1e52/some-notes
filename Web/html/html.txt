@@ -1,0 +1,589 @@
+Списки:
+
+упорядоченные
+<ol>
+	<li> Порежьте картофель кубиками.</li>
+	<li> Варите картофель в соленой воде на медленном
+	огне в течение 15-20 минут до размягчения.</li>
+</ol>
+
+неупорядоченные
+<ul>
+	<li>1 кг картофеля</li>
+	<li>100 мл молока</li>
+</ul>
+
+определений
+<dl>
+	<dt> Сашими</dt>
+	<dd> Сырая рыба, нарезанная тонкими кусочками;
+	подается с такими приправами, как
+	нашинкованная японская редька (дайкон),
+	корень имбиря, васаби или соевый соус.</dd>
+	<dt> Весы</dt>
+	<dd> Прибор, используемый для определения точного
+	веса ингредиентов.</dd>
+	<dd> Зодиакальный знак, распространяющийся на
+	календаре с 23 сентября по 22 октября,
+	единственный в зодиаке неодушевленный
+	символ.</dd>
+</dl>
+
+вложенные
+<ul>
+	<li>Муссы</li>
+	<li>Пирожные
+		<ul>
+		<li>Круассаны</li>
+		<li>Наполеон</li>
+		<li>Чизкейки</li>
+		<li>Профитроли</li>
+		</ul>
+	</li>
+	<li>Торты</li>
+</ul>
+____________________________________________________________________________________________________________________
+ссылки:
+
+mailto (<a href="mailto:vasya@primer.ru">Напишите Васе</a>) ССЫЛКИ НА ЭЛЕКТРОННУЮ ПОЧТУ
+
+target (<a href="http://www.imdb.com" target="_blank">) ОТКРЫТИЕ ССЫЛОК В НОВОМ ОКНЕ
+
+<h1 id="top">Термины, используемые при съемке фильмов</h1>
+<p><a href="#top">Наверх</a></p> ССЫЛКА НА ОПРЕДЕЛЕННУЮ ЧАСТЬ СТРАНИЦЫ
+
+<a href="http://www.htmlandcssbook.com/#bottom">. ССЫЛКА НА ОПРЕДЕЛЕННУЮ ЧАСТЬ ДРУГОЙ СТРАНИЦЫ
+____________________________________________________________________________________________________________________
+изображения:
+
+Фотографии лучше всего сохранять в формате JPEG, иллюстрации и логотипы с однотонными областями — в формате GIF.
+
+Изображения, сохраняемые в папках сайта, должны обладать теми же самыми значениями высоты и ширины, что вы указали в коде страницы.
+
+СТОКОВЫЕ ФОТОХОСТИНГИ:
+www.istockphoto.com
+www.gettyimages.com
+www.fotolia.com
+
+
+<img src="images/quokka.jpg" alt="Семейка квокки" title="доп инфа" width="600" height="450">
+
+
+figure - объединяющий изображение и подпись к нему, таким образом текст и рисунок оказываются связанными друг с другом.
+
+<figure>
+	<img src="images/otters.jpg" alt="Фотография двух выдр, держащихся за лапки"><img />
+	<br />
+	<figcaption>Во время сна выдры держат друг друга за лапки, чтобы их не разнесло течением.</figcaption>
+</figure>
+____________________________________________________________________________________________________________________
+Таблицы:
+
+Таблица размещается на странице построчно. Каждая строка создается с помощью элемента <tr>.
+
+<table>
+	<tr>
+		<th></th>
+		<th scope="col">Суббота</th>
+		<th scope="col">Воскресенье</th>
+	</tr>
+	<tr>
+		<th scope="row">Продано билетов</th>
+		<td>120</td>
+		<td>135</td>
+	</tr>
+	<tr>
+		<th scope="row">Выручка</th>
+		<td>18 000 руб.</td>
+		<td>20 250 руб.</td>
+	</tr>
+</table>
+
+Объединение столбцов/строк:
+
+<table>
+	<tr>
+		<th></th>
+		<th>TV1000</th>
+		<th>ТНТ</th>
+		<th>СТС</th>
+	</tr>
+		<tr>
+		<th>20:00-21:00</th>
+		<td rowspan="2">Фильм</td>
+		<td colspan="2">Юмор</td>
+	</tr>
+	<tr>
+		<th>21:00-22:00</th>
+		<td>Ток-шоу</td>
+		<td>Мультфильм</td>
+	</tr>
+</table>
+
+Длинные таблицы:
+
+<table>
+	<thead>
+		<tr>
+			<th>Дата</th>
+			<th>Прибыль</th>
+			<th>Расход</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<th>1-е января</th>
+			<th>250</th>
+			<th>36</th>
+		</tr>
+		<tr>
+			<th>2-е января</th>
+			<th>285</th>
+			<th>48</th>
+		</tr>
+	</tbody>
+	<tfoot>
+		<tr>
+			<td></td>
+			<th>7824</th>
+			<th>1241</th>
+		</tr>
+	</tfoot>
+</table>
+____________________________________________________________________________________________________________________
+Формы:
+
+ввод текста и пароля + текстовая область
+
+<form action="http://www.primer.ru/login.php">
+	<p>Имя пользователя:
+	<input type="text" name="username" maxlength="30" />
+	</p>
+	<p>Пароль:
+	<input type="password" name="password" maxlength="30" />
+	</p>
+	<p>Что вы думаете об этом выступлении?</p>
+	<textarea name="comments" cols="20" rows="4">Введите свой комментарий...</textarea>
+</form>
+
+переключатели
+
+<form action="http://www.primer.ru/profile.php">
+	<p>Пожалуйста, выберите любимый жанр музыки:
+		<br />
+		<input type="radio" name="genre" value="rock" checked="checked" /> Рок
+		<input type="radio" name="genre" value="pop" /> Поп
+		<input type="radio" name="genre" value="techno" /> Электроника
+	</p>
+</form>
+
+флажки
+
+<form action="http://www.example.com/profile.php">
+	<p>Пожалуйста, выберите, где вы слушаете музыку:
+		<br />
+		<input type="checkbox" name="service" value="house" checked="checked" /> Дома
+		<input type="checkbox" name="service" value="work" /> На работе
+		<input type="checkbox" name="service" value="inroad" /> В дороге
+	</p>
+</form>
+
+раскрывающийся список
+
+<form action="http://www.example.com/profi le.php">
+	<p> На каком устройстве вы слушаете музыку чаще
+	всего?</p>
+	<select name="ustroistva">
+		<option value="ipod">iPod</option>
+		<option value="radio">Радио</option>
+		<option value="computer">Компьютер</option>
+	</select>
+</form>
+
+список множественного выбора
+
+<form action="http://www.primer.ru/profi le.php">
+	<p> Играете ли вы на одном из инструментов,
+	перечисленных ниже? (Вы можете выбрать сразу
+	несколько вариантов ответа, нажав и удерживая
+	клавишу <b>Ctrl</b> (Windows) или <b>Cmd</b>
+	(OS X)).</p>
+	<select name="instrumenty" size="3" multiple="multiple">
+		<option value="gitara" selected="selected">Гитара</option>
+		<option value="barabany">Барабаны</option>
+		<option value="klavishnye" selected="selected">Клавишные</option>
+		<option value="bas">Бас-гитара</option>
+	</select>
+</form>
+
+загрузка файлов на сервер
+
+<form action="http://www.primer.ru/zagruzka.php" method="post">
+	<p>Выгрузите свою песню в формате MP3:</p>
+	<input type="file" name="pesnya" />
+	<br />
+	<input type="submit" value="Загрузить" />
+</form>
+
+кнопка подтверждения
+
+<form action="http://www.primer.ru/podpiska.php">
+	<p>Подпишитесь на рассылку наших новостей:</p>
+	<input type="text" name="email" />
+	<input type="submit" name="podpisatsya" value="Подписаться" />
+</form>
+
+графическая кнопка
+
+<form action="http://www.primer.ru/podpiska.php">
+	<p>Подпишитесь на рассылку наших новостей:</p>
+	<input type="text" name="email" />
+	<input type="image" src="images/subscribe.jpg" width="100" height="20" />
+</form>
+
+кнопки и скрытые элементы формы
+
+<form action="http://www.example.com/add.php">
+	<button>
+		<img src="images/add.gif" alt="добавить" width="10" height="10" />Добавить
+	</button>
+	<input type="hidden" name="zakladka" value="tekst_pesni" />
+</form>
+
+
+метки элементов формы
+
+<label>Возраст: <input type="text" name="vozrast" /></label>
+<br />
+Пол:
+<input id="female" type="radio" name="pol" value="f">
+<label for="female">Женский</label>
+<input id="male" type="radio" name="pol" value="m">
+<label for="male">Мужской</label>
+
+группировка элементов формы
+
+<fieldset>
+<legend>Контактная информация</legend>
+	<label>Email:<br />
+	<input type="text" name="email" /></label><br />
+	<label>Телефон:<br />
+	<input type="text" name="phone" /></label><br />
+	<label>Факс:<br />
+	<input type="text" name="fax" /></label>
+</fieldset>
+
+валидация данных формы (в required значение не обязательно)
+
+<form action="http://www.primer.ru/login/" method="post">
+	<label for="username">Имя пользователя:</label>
+	<input type="text" id="username" name="imyapolz" required="required" /><br />
+	<label for="password">Пароль:</label>
+	<input type="password" id="password" name="parol" required="required" />
+	<input type="submit" value="Отправить" />
+</form>
+
+ввод даты
+
+<form action="http://www.primer.ru/bookings/" method="post"
+	<label for="depart">Дата вылета</label>
+	<input id="depart" type="date" name="depart" />
+	<input type="submit" value="Отправить">
+</form>
+
+ввод url-адреса и адреса электронной почты
+
+<form action="http://www.primer.ru/profile.php" method="post"
+	<p>Пожалуйста введите адрес электронной почты:</p>
+	<input type="email" name="email" />
+	<input type="submit" value="Отправить">
+</form>
+
+<form action="http://www.primer.ru/profi le.php" method="post"
+	<p>Пожалуйста введите адрес вашего сайта:</p>
+	<input type="url" name="sait" />
+	<input type="submit" value="Отправить">
+</form>
+
+поле ввода поискового запроса
+
+<form action="http://www.example.org/search.php">
+	<p>Поиск:</p>
+	<input type="search" name="poisk" placeholder="Купить компьютер" />
+	<input type="submit" value="Искать" />
+</form>
+
+пример:
+
+<html>
+	<head>
+		<title>Формы</title>
+	</head>
+	<body>
+		<form action="http://www.example.com/review.php" method="get">
+			<fieldset>
+				<legend>
+				Данные пользователя:
+				</legend>
+				<label>
+				Имя:
+				<input type="text" name="name" size="30" maxlength="100">
+				</label>
+				<br />
+				<label>
+				Email:
+				<input type="email" name="email" size="30" maxlength="100">
+				</label>
+				<br />
+			</fieldset>
+			<br />
+			<fieldset>
+				<legend>
+				Ваше мнение:
+				</legend>
+				<p>
+					<label for="hear-about">
+					Как вы узнали о нас?
+					</label>
+					<select name="referrer" id="hear-about">
+						<option value="google">Google</option>
+						<option value="friend">От друзей</option>
+						<option value="advert">Реклама</option>
+						<option value="other">Другое</option>
+					</select>
+				</p>
+				<p>
+					Посетите ли вы наш сайт снова?
+					<br />
+					<label>
+						<input type="radio" name="rating" value="yes" />
+						Да
+					</label>
+					<label>
+						<input type="radio" name="rating" value="no" />
+						Нет
+					</label>
+					<label>
+						<input type="radio" name="rating" value="maybe" />
+						Возможно
+					</label>
+				</p>
+				<p>
+					<label for="comments">
+						Комментарий:
+					</label>
+					<br />
+					<textarea rows="4" cols="40" id="comments"></textarea>
+				</p>
+				<label>
+					<input type="checkbox" name="subscribe" checked="checked" />
+					Я хочу получать рассылку с новостями сайта
+				</label>
+				<br />
+				<input type="submit" value="Submit review" />
+			</fieldset>
+		</form>
+	</body>
+</html>
+_____________________________________________________________________________________________________________
+
+<!-- текст комментария -->
+
+блочные элементы
+
+Некоторые элементы всегда отображаются в браузерах с новой строки. Это так называемые блочные элементы .
+Примерами блочных элементов могут быть:
+<h1>, <p>, <ul> и <li>.
+
+встроенные элементы
+
+Некоторые элементы отображаются на той же строке, что и соседние — они называются встроенными.
+Примерами таких элементов могут быть:
+<a>, <b>, <em> и <img>.
+_____________________________________________________________________________________________________________
+группировка текста и элементов в блок
+
+<div id="header">
+	<img src="images/logo.gif" alt="Electric Universe" />
+	<ul>
+		<li><a href="index.html">Главная</a></li>
+		<li><a href="biography.html">Биография</a></li>
+		<li><a href="works.html">Дискография</a></li>
+		<li><a href="contact.html">Контакты</a></li>
+	</ul>
+</div> <!-- конец заголовка -->
+
+группировка текста и элементов в строку
+
+<p>Electric Universe — проект в жанре
+<span class="psy">психоделический транс</span>, основанный в Германии в 1991 году.
+</p>
+_____________________________________________________________________________________________________________
+плавающие фреймы
+
+<iframe
+	width="380"
+	height="100"
+	src="grouping-inline-elements.html">
+</iframe>
+_____________________________________________________________________________________________________________
+сведения о странице
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Сведения о ваших веб-страницах</title>
+		<meta name="description" content="Эссе об искусстве инсталляций" />
+		<meta name="keywords" content="инсталляция, искусство, мнение" />
+		<meta name="robots" content="nofollow" />
+		<meta http-equiv="author" content="Джон Даккет" />
+		<meta http-equiv="pragma" content="no-cache" />
+		<meta http-equiv="expires" content="Fri, 04 Apr 2014 23:59:59 GMT" />
+	</head>
+	<body>
+	</body>
+</html>
+_____________________________________________________________________________________________________________
+
+специальные символы
+
+< Знак меньше
+&lt;
+&#60;
+
+> Знак больше
+&gt;
+
+& Амперсанд
+&amp;
+&#38;
+
+" Кавычки
+&quot;
+&#34;
+
+¢ Цент
+&cent;
+&#162;
+
+£ Британский фунт
+&pound;
+&#163;
+
+¥ Японская йена
+&yen;
+&#165;
+
+€ Евро
+&euro;
+&#8364;
+
+© Символ защиты авторских прав
+&copy;
+&#169;
+
+® Зарегистрированная торговая марка
+&reg;
+&#174;
+
+™ Торговая марка
+&trade;
+&#8482;
+
+‘ Открывающая одинарная кавычка
+&lsquo;
+&#8216;
+
+' Закрывающая одинарная кавычка
+&rsquo;
+&#8217;
+
+“ Открывающая двойная кавычка
+&ldquo;
+&#8220;
+
+” Закрывающая двойная кавычка
+&rdquo;
+&#8221;
+
+× Знак умножения
+&times;
+&#215;
+
+÷ Знак деления
+&divide;
+&#247;
+_____________________________________________________________________________________________________________
+добавление видеоконтента на страницу
+
+В языке HTML5 не обязательно присваивать значе- ния атрибутам controls, autoplay и loop, используемым с элементом <video>.
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>HTML5: добавление видео на страницу</title>
+	</head>
+	<body>
+		<video src="video/puppy.mp4"
+		poster="images/puppy.jpg"
+		width="400" height="300"
+		preload
+		controls
+		loop>
+		<p>Щенок, играющий в снегу</p>
+		</video>
+	</body>
+</html>
+
+несколько источников видеоконтента
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>HTML5: несколько источников видео</title>
+	</head>
+	<body>
+		<video poster="images/puppy.jpg" width="400"
+		height="320" preload controls loop>
+			<source src="video/puppy.mp4" type='video/
+			mp4;codecs="avc1.42E01E, mp4a.40.2"' />
+			<source src="video/puppy.webm" type='video/
+			webm;codecs="vp8, vorbis"' />
+			<p>Щенок, играющий в снегу</p>
+		</video>
+	</body>
+</html>
+_____________________________________________________________________________________________________________
+добавление аудиоконтента на страницу
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>HTML5: добавление аудиоконтента
+	на страницу</title>
+	</head>
+	<body>
+		<audio src="audio/test-audio.ogg" controls
+		autoplay>
+			<p>Ваш браузер не поддерживает формат данного аудиофайла.</p>
+		</audio>
+	</body>
+</html>
+
+несколько источников аудиоконтента
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<title> HTML5: несколько источников
+	аудиоконтента</title>
+	</head>
+	<body>
+		<audio controls autoplay>
+			<source src="audio/test-audio.ogg" />
+			<source src="audio/test-audio.mp3" />
+			<p> Ваш браузер не поддерживает формат данного аудиофайла.</p>
+		</audio>
+	</body>
+</html>
+_____________________________________________________________________________________________________________

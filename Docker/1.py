@@ -1,4 +1,6 @@
 """
+https://docs.docker.com/reference/cli/docker/
+
 Docker - это сервис для запуска приложений в контейнерах.
 
 Преимущества:
@@ -71,35 +73,8 @@ Control groups позволяют Docker ограничивать ресурсы
 UnionFS позволяет создавать слои в образах, благодаря которым
 сборка и доставка образов становится легковесной и быстрой.
 ________________________________________________________________________________________________________________________
-
-# показывает список локальных образов
-docker images
-
-# создает и запускает контейнер из образа(даже если его нет локально, найдет его и скачает)
-# :tag указание тега (latest, 1.0, etc...)
-docker run image_name:tag
-
-# собирает образ на основе Dockerfile в указанном каталоге(.)
-docker build .
-
-# показывает статистику по запущенным образам
-docker stats
-
-# удаляет контейнер по id/name
-# rm(remove)
-docker rm container_id/container_name
-
-# удаляет образ
-docker image rm image_id
-
-# останавливает контейнер по id/name
-docker stop container_id/container_name
-
-# если не останавливается через stop, то через kill процесс будет остановлен моментально
-docker kill container_id/container_name
-
-# удаляет все остановленные контейнеры
-docker container prune
+# показывает версию докера
+docker version
 
 # показывает список локальных томов
 docker volume ls
@@ -107,84 +82,14 @@ docker volume ls
 # показывает информацию о volume
 docker volume inspect volume_name
 
-# удаляет все образы
-# -a, за исключением тех, для которых есть работающие контейнеры
-docker image prune -a
+# для работы с удаленными докер-хостами
+export DOCKER_HOST=some ip
+# переключение на локальный хост
+export DOCKER_HOST=
 
-# запуск дополнительного процесса внутри уже запущенного контейнера
-docker exec -it container_id/container_name process_name
-docker exec -it container_id/container_name bash
-
-# показывает информацию о контейнере по id/name
-docker container inspect container_id/container_name
-
-# |, также известная как "pipe" в командной строке UNIX и Linux, используется для передачи вывода одной команды на вход другой команды
-# grep в операционных системах UNIX и Linux используется для поиска строк текста, которые соответствуют определенному шаблону
-docker container inspect container_id | grep IPAddress
-
-# показывает id контейнера
-hostname
-# показывает ip адрес контейнера
-hostname -i
-
-# показывает логи контейнера по id/name
-# -f подключается к контейнеру и выводит все логи(слушает что еще будет писать), чтобы не вводить 100 раз команду logs
-# --tail n - показывает только последние n строк
-docker logs container_id/container_name
+docker -H=адрес_удаленного_хоста:порт run image_name
 ________________________________________________________________________________________________________________________
-# запуск контейнеров на основе docker-compose.yml
-в фоновом режиме(-d)
-docker-compose up -d
 
-# остановка всех контейнеров и их удаление
-docker-compose down
-
-# запуск контейнеров с пересозданием образов
-docker-compose up -d --build
-
-# -f если имя docker-compose отличается от docker-compose.yml, указываем явно какое. При down тоже указываем -f
-docker-compose up -f docker-compose-dev.yml -d
-
-# поднять еще n-контейнеров
-docker-compose scale container_name=number_of_containers
-________________________________________________________________________________________________________________________
-todo Flags
-
-# показывает список запущенных и остановленных контейнеров. Без -a только запущенных
-# ps(process status), -a(all)
-docker ps -a
-
-# -i(--interactive) -t (--tty (Teletype)) чтобы подключить терминал к процессу контейнера
-docker run -it image_name
-
-# -d(--detach) для запуска в фоновом режиме. Чтобы мы не были подключены к выводу из процесса
-docker run -d image_name
-
-# -p(--publish) открывает порт(внешний) на компьютере и пробрасывает его на порт(внутренний) в контейнере
-docker run -p 8080:80 image_name
-
-# -v(--volume) подключение тома
-# содержимое внутри папки контейнера будет заменено содержимым из локальной папки
-docker run -v ${PWD}(путь к локальной папке):/path/to/container(путь к папке в контейнере) image_name
-
-# -e (--env) добавление переменных окружения
-docker run -d -e MY_ENV_VARIABLE=value image_name
-
-# -t(добавление имени и тега для образа, если тег не указан, то будет использован latest)
-# -f если имя Dockerfile отличается от Dockerfile, указываем явно какое.
-docker build . -t image_name -f Dockerfile-dev
-________________________________________________________________________________________________________________________
-todo Options
-
-# --name установка имени контейнера
-docker run -d --name container_name image_name
-
-# --rm удаляет контейнер после остановки
-docker run -d --rm image_name
-
-# --target для выбора alias указанного в Dockerfile(при мультибилде)
-docker build -t image_name . -f Dockerfile-dev --target dev(устанавливается как alias в Dockerfile)
-________________________________________________________________________________________________________________________
 todo Docker Hub
 
 # создание образа с префиксом username с docker hub
@@ -193,10 +98,10 @@ docker build -t docker_hub_username/image_name .
 # авторизация в docker hub
 docker login
 
-# только скачивает образ и сохраняет его локально
+# только скачивает образ и сохраняет его локально, не запуская
 docker pull image_name
 
-# загрузить образ на docker hub
+# загрузить образ на docker hub (в имени образа должен быть docker_hub_username/image_name)
 docker push image_name
 
 
