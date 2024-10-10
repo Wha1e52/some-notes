@@ -73,7 +73,7 @@ docker run -d image_name
 # -p(--publish) открывает порт(внешний) на компьютере и пробрасывает его на порт(внутренний) в контейнере
 docker run -p 8080:80 image_name
 
-# -v(--volume) подключение тома
+# -v(--volume) подключение тома (если тома нет, то он будет создан)
 # содержимое внутри папки контейнера будет заменено содержимым из локальной папки
 docker run -v ${PWD}(путь к локальной папке):/path/to/container(путь к папке в контейнере) image_name
 
@@ -102,6 +102,7 @@ docker run --cpus=.5 image_name
 # --memory ограничение памяти в мегабайтах для контейнера
 docker run --memory=512m image_name
 
-
+--mount более предпочтительный способ привязки томов чем -v
+docker run --mount type=bind,source=/data/mysql,target=/var/lib/mysql image_name
 
 """

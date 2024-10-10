@@ -76,6 +76,9 @@ ________________________________________________________________________________
 # показывает версию докера
 docker version
 
+# создает том (volume)
+docker volume create dir_name
+
 # показывает список локальных томов
 docker volume ls
 
@@ -88,6 +91,10 @@ export DOCKER_HOST=some ip
 export DOCKER_HOST=
 
 docker -H=адрес_удаленного_хоста:порт run image_name
+
+# просто названия
+volume mount монтирует том из каталога томов
+bind mount монтирует из любого места на докер-хосте
 ________________________________________________________________________________________________________________________
 
 todo Docker Hub
@@ -104,11 +111,24 @@ docker pull image_name
 # загрузить образ на docker hub (в имени образа должен быть docker_hub_username/image_name)
 docker push image_name
 
+________________________________________________________________________________________________________________________
 
+todo сети
 
+# bridge (по умолчанию)
+docker run some_app
 
+# none (нет сети)
+docker run some_app --network=none
 
+# host (сеть хоста)
+docker run some_app --network=host
 
+# показывает список сетей
+docker network ls
+
+# создание сети
+docker network create --driver bridge --subnet=182.18.0.0/16 network_name
 
 
 
