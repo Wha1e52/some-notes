@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+</head>
+<body>
+<div id="app">
+<!--    <input type="text" v-on:input="changeName">-->
+<!--    <h1>Hello {{ name }}</h1>-->
+<!--    <a v-bind:href="url">some link</a>-->
+<!--    <h2 v-html="link"></h2>-->
+
+    <h1>Counter: {{ counter2 }}</h1>
+<!--    <button @click="increaseCounter(10, $event)">Увеличить</button>-->
+
+<!--    <h1 v-on="{'mouseover': onHover, 'mouseleave': outHover}">Counter2: {{ counter2 }}</h1>-->
+    <button v-on:click="counter2++">Увеличить</button>
+
+<!--    <hr>-->
+
+<!--    <input type="text" v-model="name2">-->
+<!--    <h1>Hello {{ name2 }}</h1>-->
+    <ul>
+        <li v-for="person in people">{{ person }}</li>
+    </ul>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.7.16/dist/vue.js"></script>
+<script>
+    new Vue({
+        el: '#app', // обязательное свойство корневого элемента
+        data: {
+            // name: 'Vue',
+            // name2: 'Vue',
+            // url: 'https://vuejs.org/',
+            // link: '<a href="https://google.com">Google</a>',
+            // counter: 0,
+            counter2: 0,
+            people: ['John', 'Jane', 'Joe'],
+        },
+        computed: {
+            // для методов что возвращают объекты втф?
+            // оптимизация
+        },
+        methods: {
+            changeName: function (event) {
+                this.name = event.target.value
+            },
+            increaseCounter: function (num, event) {
+                this.counter += num
+                event.target.style.color = 'blue'
+            },
+            onHover: function (event) {
+                event.target.style.color = 'red'
+            },
+            outHover: function (event) {
+                event.target.style.color = 'black'
+            }
+        },
+        watch: {
+            counter2: function (newVal, oldVal) {
+                console.log(newVal, oldVal)
+            }
+        }
+    })
+</script>
+</body>
+</html>

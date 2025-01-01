@@ -15,6 +15,7 @@
 
 <?php
 echo 'hello'; # обычный принт, можно использовать print вместо echo
+echo 123; // под капотом приводится к строке (string) и потом выводится
 ?>
 
 <?= '<p>hello</p>' ?> == <?php echo '<p>hello</p>'?>
@@ -51,7 +52,7 @@ echo INF; # бесконечность
 $var_bool = true | false;
 // 0, -0, 0.0, -0.0, '0', '', null, [] === false
 $var_int = 12;
-$var_float = 3.14;
+$var_float = 3.14; // никогда не сравнивай float === float
 $var_string = 'hello world';
 
 # compound types
@@ -72,6 +73,7 @@ var_dump((int) '123');
 var_dump((float) 123);
 var_dump((string) 123);
 var_dump((0.1 * 10 + 0.2 * 10) / 10); # как избежать проблем плавающей точки 0.200000004
+// при приведении строки к (int)/(float) если строка не число, будет 0
 ?>
 
 <!-- Полезные функции -->
@@ -140,6 +142,7 @@ HERE;
 # match-case в питоне
 $a = 5;
 # не забудь break
+// если передадим функцию, то выполняется только 1 раз и потом только сравнивает результат
 switch ($a){
     case 1:
         echo '1';
@@ -191,6 +194,11 @@ while (true) {
     $x++;
 }
 
+$x = 0;
+do {
+    echo $x++;
+} while ($x <= 10);
+
 # for
     
 # счетчик, условие, действие. более краткая версия while
@@ -220,6 +228,11 @@ foreach ($some_list3 as $key => $value) {
 
 # для изменения значений во время цикла нужно приписать & (foreach ($some_list3 as &$value))
 # и после цикла уничтожить переменную unset($value); обязательно (при работе с &)
+foreach ($some_list3 as $key => &$value) {
+    echo "Key: $key, Value: $value" . "<br>";
+}
+unset($value);
+
 
 # alternative syntax for foreach
 foreach ($some_list3 as $value):
@@ -245,6 +258,7 @@ echo $list3['price']; # получаем значение по ключу
 $list3['new_key'] = 'new value'; # добавляем новую пару ключ-значение
 $list[] = 'whale'; # добавление 1 нового элемента в конец
 $list[2] = 'duck'; # изменение элемента по индексу
+// отрицательного индекса в массивах нет, [-1] не сработает
 echo count($list); # length в пайтон
 echo count($list2, COUNT_RECURSIVE); # рекурсивно посчитать все, в том числе и вложеные элементы. для многомерных
 print_r(array_count_values($list)); # посчитать кол-во каждого элемента (как каунтер в питоне)
@@ -287,6 +301,7 @@ $new_str3 = strtolower('cat'); # lower
 $new_str4 = strtoupper('cat'); # upper
 $new_str5 = substr($some_str, 0, 5); # срез строки
 $new_str6 = str_replace(' ', '', $some_str); # replace в питоне
+$pos = strpos($some_str, 'e') // поиск индекса по первому вхождению символа
 $firstName = 'John';
 $lastName = 'Doe';
 echo $firstName . ' ' . $lastName; # конкатенация строк

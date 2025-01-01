@@ -1,0 +1,32 @@
+v-on: / @
+v-on:input="changeName" // (v-on) повесить событие, (:input) событие, (="changeName") функция отработки в methods
+@input="changeName"
+
+v-bind / :
+<a v-bind:href="url">some link</a> // (v-bind) привязать значение к атрибуту, (:href) атрибут, (="url") переменная в data
+<a :href="url">some link</a>
+
+v-html
+<h2 v-html="link"></h2> // (v-html) рендерим html, (="link") переменная в data
+
+$event // если нужен ивент, можно передать
+<button v-on:click="increaseCounter(10, $event)">Увеличить</button>
+
+v-model // two-way binding = (@input="inputValue = $event.target.value" :value="inputValue")
+есть еще модификатор (v-model.lazy) // изменения применятся после снятия фокуса
+<input type="text" v-model="inputValue">
+
+v-if v-else-if v-else //
+
+v-show // не удаляет из dom, просто ставит display: none
+
+v-for // цикл
+<li v-for="person in people">{{ person }}</li>
+<li v-for="(person, index) in people">{{ index + 1 }} {{ person }}</li>
+<li v-for="(person, index) of people">{{ index + 1 }} {{ person.name }}</li>
+<li v-for="(value, key, index) in people">{{ index }} <b>{{ key }}</b> {{ value }}</li>
+
+ref
+<h2 ref="heading">{{ title }}</h2>
+...
+this.$refs.heading
