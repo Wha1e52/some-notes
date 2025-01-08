@@ -22,13 +22,29 @@ route('users.comments.show', ['userId' => 1, 'commentId' => 2, 'opt' => 'a'])
 Хотя маршрут можно назвать как угодно, общепринятая практика — составное имя,
 включающее в себя название ресурса во множественном числе, точку и наименование действия.
 
+// Генерирование подписанной ссылки
+URL::signedRoute('invitations', ['invitation' => 12345, 'answer' => 'yes']);
 
-чтобы динамически создать все руты контроллера
+// Генерирование подписанной ссылки с ограниченным сроком действия (временной)
+URL::temporarySignedRoute(
+    'invitations',
+    now()->addHours(4),
+    ['invitation' => 12345, 'answer' => 'yes']
+);
+// Сгенерировав ссылку для подписанного маршрута, необходимо также предотвратить доступ к нему без подписи
+Route::get('invitations/{invitation}/{answer}', 'InvitationController::class')
+    ->name('invitations')
+    ->middleware('signed');
+
+
+чтобы динамически создать все руты контроллера ресурса
 Route::resource('posts', PostController::class);
 можно немного управлять через
 ->only(['index', 'show'])
 ->except(['destroy', 'update']);
 
+чтобы динамически создать все руты контроллера апи
+Route::apiResource('tasks', TaskController::class);
 
 динамический рут
 Route::get('/posts/{id}/comments/{comment}', function ($id, $comment_id) {
@@ -51,8 +67,6 @@ return Application::configure(basePath: dirname(__DIR__))
     ...
     })->create();
 
-Route::redirect('/here', '/there', 302) // редериктим с одного эндпоинта на другой, можем указать еще и код
-
 группировка маршрутов по префиксу:
 Route::prefix('admin')->group(function () {
     Route::get('/users', 'AdminController@users'); // строковый синтаксис(старый), тоже что и [AdminController::class, 'users']
@@ -61,7 +75,40 @@ Route::prefix('admin')->group(function () {
 });
 можно группировать и без префикса
 
-в случае если ендпоинта нет и мы не хотим выбрасывать 404, то будет отрабатывать fallback
+Запрещение доступа к группе маршрутов для пользователей, не прошедших аутентификацию
+Route::middleware('auth')->group(function() {
+    Route::get('dashboard', function () {
+        return view('dashboard');
+    });
+    Route::get('account', function () {
+        return view('account');
+    });
+});
+
+Поддоменная маршрутизация
+Route::domain('api.myapp.com')->group(function () {
+    Route::get('/', function () {
+        //
+    });
+});
+
+Префиксы имен для групп маршрутов
+Route::name('users.')->prefix('users')->group(function () {
+    Route::name('comments.')->prefix('comments')->group(function () {
+        Route::get('{id}', function () {
+            // ...
+        })->name('show');
+        Route::destroy('{id}', function () {})->name('destroy');
+    });
+});
+
+Контроллеры групп маршрутов
+Route::controller(UserController::class)->group(function () {
+    Route::get('/', 'index');
+    Route::get('{id}', 'show');
+});
+
+будет перехватывать запросы, не соответствующие ни одному из предшествующих маршрутов
 определяем самым последним в файле
 Route::fallback(function () {
     return 'такого эндпоинта нет';
@@ -75,7 +122,23 @@ Route::fallback(function () {
     abort(404, 'такого эндпоинта нет'); // по типу die и exit
 })
 
+// отправит файл file501751.pdf и переименует его при отправке в myFile.pdf.
+return response()->download('file501751.pdf', 'myFile.pdf')
+Чтобы отобразить тот же файл в браузере (если это PDF-файл, изображение или что-то еще,
+что может обрабатывать браузер), используйте взамен
+response()->file()
+Потоковая загрузка с внешних серверов
+return response()->streamDownload(function () {
+    echo DocumentService::file('myFile')->getContent();
+}, 'myFile.pdf');
 
+
+Отмена с кодом состояния 403 Forbidden (Доступ запрещен)
+Route::post('something-you-cant-do', function (Illuminate\Http\Request $request) {
+    abort(403, 'You cannot do that!');
+    abort_unless($request->has('magicToken'), 403);
+    abort_if($request->user()->isBanned, 403);
+});
 
 Route::get('/', function () {
     return 'Hello, World!';
@@ -113,17 +176,33 @@ Route::get('friends/types/{type}', function ($type) {
 //
 })->whereIn('type', ['acquaintance', 'bestie', 'frenemy']);
 
+Передача переменных в представления
+Route::get('tasks', function () {
+    return view('tasks.index')->with('tasks', Task::all());
+});
 
+Привязка модели маршрута
+Route::get('conferences/{conference}', function (Conference $conference) {
+    return view('conferences.show')->with('conference', $conference);
+});
+вместо
+Route::get('conferences/{id}', function ($id) {
+    $conference = Conference::findOrFail($id);
+    return view('conferences.show')->with('conference', $conference);
+});
 
+Настройка ключа маршрута для конкретного маршрута (в каком столбце искать в бд) двоеточие и имя столбца
+Route::get('conferences/{conference:slug}', function (Conference $conference) {
+    return view('conferences.show')->with('conference', $conference);
+});
 
-
-
-
-
-
-
-
-
+Если в URL есть два динамических сегмента (например, organizers/{organizer}/conferences/{conference:slug}),
+то фреймворк Laravel автоматически попытается ограничить запросы второй модели только теми, которые связаны с первой.
+Поэтому он проверит модель Organizer на наличие связи с conferences и, если она существует, вернет только те
+экземпляры Conferences, которые связаны с Organizer, найденным в результате поиска по первому сегменту
+Route::get('organizers/{organizer}/conferences/{conference:slug}', function (Organizer $organizer, Conference $conference) {
+    return $conference;
+});
 
 
 */
