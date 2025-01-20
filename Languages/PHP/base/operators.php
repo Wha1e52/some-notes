@@ -74,6 +74,16 @@ $z = $x === $y; # false #проверяет равенство ключей, з�
 # null coalescing operator
 echo $var ?? 'default value'; # если $var не null, то вернет $var, если null, то вернет 'default value'
 
+# nullsafe operator
+$user = null;
+// если объект, к которому применяется ?->, равен null, выполнение выражения прекратится и вернётся null
+$city = $user?->getAddress()?->getCity();
+$city = $user?->getAddress() ?? 'not provided';
+
+# null coalescing assignment
+$arr = [];
+$arr['key'] ??= 'value'; // если $arr['key'] не существует, то присвоит 'value'
+
 # ternary operator:
 # условие ? если истина : если ложь
 echo $var == 'green' ? 'go' : 'stop';

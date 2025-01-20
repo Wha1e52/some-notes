@@ -100,6 +100,12 @@ class SomeController extends Controller
     }
 }
 
+// ContactController
+public function show($contactId)
+{
+    return view('contacts.show')
+        ->with('contact', Contact::findOrFail($contactId));
+}
 
 
 

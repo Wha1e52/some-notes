@@ -36,6 +36,12 @@ followed by an underscore and the word set:
 >> t.entry_set.all()
 <QuerySet [<Entry: The opening is the first part of the game, roughly...>, <Entry: In the opening phase of the game, it's important t...>]>
 
+# вернет True - если есть записи, если нет - False
+t.entry_set.exists()
+
+# вернет количество записей
+t.entry_set.count() / Topic.objects.filter(entry_id=1).count()
+
 The shell is really useful for making sure your code retrieves the data you want it to. If your code works as you expect it to in the shell, it should also work properly in the files within your project.
 Each time you modify your models, you’ll need to restart the shell to see the effects of those changes. To exit a shell session, press CTRL-D; on Windows, press CTRL-Z and then press ENTER.
 ________________________________________________________________________________________________________________________
@@ -100,6 +106,8 @@ ___________________________________________
 Using the filter() method
 
 Post.objects.filter(publish__year=2022, author__username='admin')
+если указывать условия через ",", будет применяться AND
+
 This equates to building the same QuerySet chaining multiple filters:
 Post.objects.filter(publish__year=2022).filter(author__username='admin')
 ___________________________________________
@@ -160,6 +168,20 @@ from django.db.models import Q
 Post.objects.filter(publish__year=2022, author__username='admin') = publish__year=2022 AND author__username='admin'
 
 Post.objects.filter(~Q(publish__year=2022) | Q(author__username='admin')) = NOT publish__year=2022 OR author__username='admin'
+
+from django.db.models import Q
+
+# будет применяться OR вместо "|"
+Post.objects.filter(Q(author__username='admin') | Q(is_published=True))
+
+# будет применяться AND вместо "&"
+Post.objects.filter(Q(author__username='admin') & Q(is_published=True))
+
+# ~Q - логическое НЕ
+Post.objects.filter(~Q(author__username='admin') & Q(is_published=True))
+
+# можно и комбинировать, только писать после Q, либо оборачивать в Q()
+Post.objects.filter(Q(author__username='admin') | Q(is_published=True), publish__year=2022)
 ________________________________________________________________________________________________________________________
 F() objects
 # можно работать со значениями полей
@@ -171,6 +193,15 @@ Post.objects.update(publish=F('publish') + datetime.timedelta(days=1))
 
 course = Course.objects.get(pk=1)
 course.some_field = F('some_field') + 1
+
+from django.db.models import F
+
+# чтобы сравнить идентификаторы со значениями поля
+Post.objects.filter(pk__gt=F('author_id'))
+
+# изменение полей через += не рекомендуется, используем F()
+post = Post.objects.filter(pk=1)
+post.post_views = F('post_views') + 1
 
 # annotate добавляет новое поле для выборки
 # When you need to represent the value of an integer, boolean, or
@@ -222,4 +253,36 @@ prefetch_related(key) – «жадная» загрузка связанных �
 
 как я понял происходит обычный JOIN
 Course.objects.select_related('students')
+
+
+
+
+from django.db.models import Value
+
+# добавляем новое поле к выборке через annotate и присваиваем ему значение
+Post.objects.annotate(some_field=Value('Some value'))
+
+# Value уже не нужен т.к F() берет все на себя
+Post.objects.annotate(some_field=F('post_views' * 3), another_field=Value('Some value'))
+________________________________________________________________________________________________________________________
+# получить первый элемент
+Post.objects.first()
+
+# получить последний элемент
+Post.objects.last()
+
+# получить самый ранний элемент по колонке(DateTimeField)
+Post.objects.earliest('publish')
+
+# получить самый поздний элемент по колонке(DateTimeField)
+Post.objects.latest('publish')
+
+# получить предыдущий по порядку элемент относительно поля DateTimeField (publish)
+post = Post.objects.get(pk=2)
+post.get_previous_by_publish()
+
+
+# получить следующий элемент относительно поля DateTimeField (publish)
+post = Post.objects.get(pk=2)
+post.get_next_by_publish(pk__gt=1)
 """

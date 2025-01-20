@@ -4,7 +4,7 @@
 
 // команда для создания модели
 php artisan make:model Flight
-
+(может принимать доп аргументы для создания еще и миграции, контролера и т.п)
 
 namespace App\Models;
 
@@ -19,6 +19,8 @@ class Flight extends Model
     protected $hidden = ['SomeColumn1', 'SomeColumn2']; // скрываем поля при переводе в json или toArray
     protected $fillable = ['SomeColumn1', 'SomeColumn2']; // разрешаем массово заполнять поля
     protected $guarded = ['SomeColumn1', 'SomeColumn2']; // запрещаем массово заполнять поля
+    public $timestamps = false; // убираем поля created_at и updated_at
+    protected $dateFormat = 'U'; // задаем формат даты для меток времени
 
 
     // кастомные методы для модели
@@ -102,7 +104,7 @@ class Phone extends Model
 $user = Phone::find(1)->user;
 
 
-// Many to Many
+// Many to Many (m2m)
 relationship's table structure like so:
 
 users
@@ -148,13 +150,15 @@ class Role extends Model
 {
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class);
+        return $this->belongsToMany(User::class, foreignPivotKey: 'some_role_id'); // чтобы явно указать имя столбца, если не соответствует конвенции
+        // в другой таблице указываем relatedPivotKey
     }
 
     public function latestActive(): HasOne // получаем последнюю активную запись
     {
-        return $this->users()->one()->ofMany([
-            'order' => 'desc'], function (Builder $query) {
+        return $this->users()->one()->ofMany(
+            ['order' => 'desc'],
+            function (Builder $query) {
                 $query->where('active', '=' true);
             });
     }
@@ -227,4 +231,11 @@ $user->roles()->detach();
 
 
 $user->roles()->toggle([1, 2, 3]); // удаляем те которые уже есть в бд, и добавляем которых нет
+
+// выводит сводную информацию о модели
+model:show
+
+$user->roles()->get(); // получаем все, если $user->roles не обновилась
+$user->roles()->get()->pluck('name'); // получить массив значений из столбца name
+
 */

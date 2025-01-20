@@ -110,6 +110,7 @@ echo is_null(12); # проверяет на null (12 === null)
 # mkdir('folder/another')
 # rmdir('folder/another')
 # unlink('folder/file.txt') удаляет файл
+parse_url('https://google.com');
 ?>
 
 
@@ -304,6 +305,9 @@ $new_str4 = strtoupper('cat'); # upper
 $new_str5 = substr($some_str, 0, 5); # срез строки
 $new_str6 = str_replace(' ', '', $some_str); # replace в питоне
 $pos = strpos($some_str, 'e') // поиск индекса по первому вхождению символа
+str_starts_with($some_str, 'asdsa_') // проверка на начало строки
+str_ends_with($some_str, '_asdsa') // проверка на конец строки
+str_contains($some_str, 'asdsa') // проверка на наличие подстроки
 $firstName = 'John';
 $lastName = 'Doe';
 echo $firstName . ' ' . $lastName; # конкатенация строк
