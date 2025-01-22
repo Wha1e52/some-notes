@@ -228,7 +228,7 @@ $contacts = DB::table('contacts')
     ->union($first)
     ->get();
 
-// быстро увеличивать/уменьшать значения столбцов, применяя методы increment() и decment().
+// быстро увеличивать/уменьшать значения столбцов, применяя методы increment() и decrement().
 DB::table('contacts')->increment('tokens', 5);
 DB::table('contacts')->decrement('tokens');
 

@@ -75,6 +75,9 @@ Http::get('https://jsonplaceholder.typicode.com/todos/1')->json();
 В Laravel есть функция now(), которая выполняет то же, что и метод Carbon::now() — возвращает экземпляр объекта Carbon в его текущем виде.
 Carbon — это включенная в состав Laravel библиотека для работы с датой и временем.
 
-
+// скопировать файлы для ручного редактирования из асетов
+php artisan vendor:publish
+и теперь в boot методе App\Providers\AppServiceProvider можно например поменять шаблон пагинации
+Paginator::useBootstrapFive();
 
 */

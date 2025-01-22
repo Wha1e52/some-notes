@@ -11,6 +11,20 @@ php artisan make:controller SomeController --resource
 команда для создания контроллера для апи(обычный контроллер ресурсов, за исключением создания и редактирования)
 php artisan make:controller SomeController --api
 
+Маршрутизатор Laravel в конечном итоге преобразует все возвращаемые маршруты в строку, но есть хитрый прием.
+Если вернуть результат вызова Eloquent в контроллере, он будет автоматически преобразован в строку и,
+следовательно, возвращен как JSON.
+Возврат JSON из маршрутов напрямую
+// routes/web.php
+Route::get('api/contacts', function () {
+    return Contact::all();
+});
+Route::get('api/contacts/{id}', function ($id) {
+    return Contact::findOrFail($id);
+});
+
+
+
 
 
 class SomeController extends Controller
