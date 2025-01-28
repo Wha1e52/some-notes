@@ -77,7 +77,7 @@ Route::post('form', function (Illuminate\Http\Request $request) {
     $validator = Validator::make($request->all(), $this->validationRules);
     if ($validator->fails()) {
         return back()
-            ->withErrors($validator)
+            ->withErrors($validator) // присвоится переменной $errors.
             ->withInput();
     }
 });

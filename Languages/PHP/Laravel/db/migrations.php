@@ -49,7 +49,7 @@ return new class extends Migration
             $table->string('airline')->nullable();
             $table->boolean('status')->default(false);
             $table->enum(some_enum, [choiceOne, choiceTwo])
-            $table->timestamps(); // добавляет колонки created_at и updated_at, но они чета нихуя не заполняются(заполняются через orm)
+            $table->timestamps(); // добавляет колонки created_at и updated_at (заполняются через orm)
         });
     }
 

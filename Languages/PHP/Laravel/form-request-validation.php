@@ -49,4 +49,46 @@ public function store(StorePostRequest $request): RedirectResponse
 
     return redirect('/posts');
 }
+------------------------------------------------------------------------------------------------------------------------
+
+// some controller
+request()->validate([
+    'title' => ['required', 'max:255'],
+    'body' => ['required'],
+    'password' => ['confirmed'], // для confirmed в форме должно быть второе поле с 1name_confirmation для сравнения
+])
+в случае ошибки валидации происходит автоматически редирект на предыдущую страницу
+
+в шаблоне
+@if ($errors->any())
+    <ul>
+        @foreach ($errors as $error)
+            <li>{{ $error }}</li>
+        @endforeach
+    </ul>
+@endif
+либо
+@error('title')
+    <div class="alert alert-danger">{{ $message }}</div> // $message маг.переменная доступная только внутри @error
+@enderror
+
+// Отсутствие переменной $errors
+Маршруты, не входящие в группу промежуточного программного обеспечения web,
+не будут иметь соответствующей сессии. Им будет недоступна переменная $errors.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 */

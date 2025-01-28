@@ -40,7 +40,17 @@ factory(Contact::class, 20)->create();
 
 
 
+public function run(): void
+    {
+        $tags = Tag::factory(3)->create();
 
+        Job::factory(20)->hasAttached($tags)->create();
+        Job::factory(20)->hasAttached($tags)->create(new Sequence([
+            'vip' => true
+        ], [
+            'vip' => false
+            ]));
+    }
 
 
 

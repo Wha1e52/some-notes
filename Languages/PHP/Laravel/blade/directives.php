@@ -149,6 +149,49 @@ Blade::directive('ifPublic', function () {
 // в каждой форме нужно установить
 @csrf
 
+// указываем метод в форме для put, patch, delete...
+@method('DELETE')
+
+// если пользователь не авторизован
+@guest
+    <a href="{{ route('login') }}">Login</a>
+@endguest
+
+// если пользователь авторизован
+@auth
+    <a href="{{ route('logout') }}">Logout</a>
+@endauth
+
+// если пользователь авторизован и имеет права на редактирование поста
+@can('edit-post', $post)
+    some html
+@endcan
+
+@cannot('edit-post', $post)
+    some html
+@endcannot
+
+
+// Подключение скриптов и стилей
+@vite(['resources/css/app.css'])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

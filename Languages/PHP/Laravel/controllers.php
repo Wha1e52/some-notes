@@ -97,7 +97,7 @@ class SomeController extends Controller
             'category_id' => ['required', 'exists:table_name,column_name'],
         ])
 
-        Post::create($request->all());
+        Post::create($validated);
         return 'success';
     }
 
@@ -121,6 +121,49 @@ public function show($contactId)
         ->with('contact', Contact::findOrFail($contactId));
 }
 
+
+//
+class SomeController extends Controller
+{
+    public function store(Request $request): string
+    {
+        $validated = $request->validate([
+            'name' => ['required'],
+            'email' => ['required', 'email'],
+            'password' => ['required', 'confirmed'],
+        ])
+
+        $user = User::create($validated);
+        Auth::login($user);
+        return redirect('/');
+    }
+}
+
+// SessionController
+class SessionController extends Controller
+{
+    public function store(Request $request): string
+    {
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
+
+        if (! Auth::attempt($credentials)) {
+           throw ValidationException::withMessages('email' => ['The provided credentials do not match.']);
+        }
+
+        request()->session()->regenerate();
+        return redirect('/');
+    }
+
+
+    public function destroy(Request $request): string
+    {
+        Auth::logout();
+        return redirect('/');
+    }
+}
 
 
 */

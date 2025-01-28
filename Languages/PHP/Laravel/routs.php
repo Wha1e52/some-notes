@@ -36,16 +36,16 @@ Route::get('invitations/{invitation}/{answer}', 'InvitationController::class')
     ->name('invitations')
     ->middleware('signed');
 
-
-чтобы динамически создать все руты контроллера ресурса
+------------------------------------------------------------------------------------------------------------------------
+// чтобы динамически создать все руты контроллера ресурса
 Route::resource('posts', PostController::class);
 можно немного управлять через
 ->only(['index', 'show'])
 ->except(['destroy', 'update']);
 
-чтобы динамически создать все руты контроллера апи
+// чтобы динамически создать все руты контроллера апи
 Route::apiResource('tasks', TaskController::class);
-
+------------------------------------------------------------------------------------------------------------------------
 динамический рут
 Route::get('/posts/{id}/comments/{comment}', function ($id, $comment_id) {
     return view('welcome', ['id' => $id, 'comment_id' => $comment_id]);
@@ -107,7 +107,7 @@ Route::controller(UserController::class)->group(function () {
     Route::get('/', 'index');
     Route::get('{id}', 'show');
 });
-
+------------------------------------------------------------------------------------------------------------------------
 будет перехватывать запросы, не соответствующие ни одному из предшествующих маршрутов
 определяем самым последним в файле
 Route::fallback(function () {
@@ -181,6 +181,10 @@ Route::get('tasks', function () {
     return view('tasks.index')->with('tasks', Task::all());
 });
 
+// сокращенная запись возврата представления
+Route::view('/tasks', 'tasks.index')->with('tasks', Task::all());
+
+------------------------------------------------------------------------------------------------------------------------
 Привязка модели маршрута
 Route::get('conferences/{conference}', function (Conference $conference) {
     return view('conferences.show')->with('conference', $conference);
@@ -203,6 +207,16 @@ Route::get('conferences/{conference:slug}', function (Conference $conference) {
 Route::get('organizers/{organizer}/conferences/{conference:slug}', function (Organizer $organizer, Conference $conference) {
     return $conference;
 });
+------------------------------------------------------------------------------------------------------------------------
+// ограничиваем доступ к редактированию поста через auth и gate
+Route::get('posts/{post}/edit', [PostController::class, 'edit'])
+    ->middleware(['auth', 'can:namefromgate,post']);
+либо
+Route::get('posts/{post}/edit', [PostController::class, 'edit'])
+    ->middleware('auth')
+    ->can('namefromgate or policy', 'post');
+
+
 
 
 */

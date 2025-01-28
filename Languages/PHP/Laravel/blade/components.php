@@ -14,7 +14,7 @@ php artisan make:component modals.cancellation
 
 Передача данных в компоненты через атрибуты
 <!-- Передача данных в компонент -->
-<x-modal title="Title here yay" :width="$width" />
+<x-modal title="Title here yay" :width="$width" />  // сахар :$width при условии что они совпадают
 <!-- Доступ к данным в шаблоне -->
 <div style="width: {{ $width }}">
     <h1>{{ $title }}</h1>

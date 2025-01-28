@@ -1,3 +1,5 @@
+/*
+
 v-on: / @
 v-on:input="changeName" // (v-on) повесить событие, (:input) событие, (="changeName") функция отработки в methods
 @input="changeName"
@@ -30,3 +32,19 @@ ref
 <h2 ref="heading">{{ title }}</h2>
 ...
 this.$refs.heading
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/

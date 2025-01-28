@@ -18,8 +18,8 @@ class Flight extends Model
     protected $primaryKey = 'SomeColumn'; // указываем pk
     protected $hidden = ['password', 'remember_token']; // скрываем поля при переводе в json или toArray
     public $visible = ['name', 'email', 'status']; // белый список с атрибутами, которые должны помещаться в JSON
-    protected $fillable = ['SomeColumn1', 'SomeColumn2']; // разрешаем массово заполнять поля в create() или update()
-    protected $guarded = ['id', 'created_at', 'updated_at', 'owner_id']; // запрещаем массово заполнять поля
+    protected $fillable = ['SomeColumn1', 'SomeColumn2']; // разрешаем массово заполнять поля в create() или update() или глобально для всех моделей в провайдере в boot, Model::unguard();
+    protected $guarded = ['id', 'created_at', 'updated_at', 'owner_id']; // запрещаем массово заполнять поля, если оставим пустым, то запрета не будет и можно убрать $fillable
     public $timestamps = false; // убираем поля created_at и updated_at
     protected $dateFormat = 'U'; // задаем формат даты для меток времени
 
@@ -32,6 +32,9 @@ class Flight extends Model
 
 }
 
+// Можно сделать атрибут видимым только для одного вызова с помощью метода Eloquent makeVisible():
+$array = $user->makeVisible('remember_token')->toArray();
+
 Настройка ключа маршрута для модели Eloquent
 Чтобы поиск на основе URL производился по другому столбцу, добавьте в модель метод с именем getRouteKeyName():
 public function getRouteKeyName() {
@@ -39,7 +42,7 @@ public function getRouteKeyName() {
 }
 Теперь, получив URL вида conference/{conference}, модель будет выполнять поиск в столбце slug, а не в столбце с идентификаторами.
 
-
+------------------------------------------------------------------------------------------------------------------------
 // One to One
 namespace App\Models;
 
@@ -71,7 +74,7 @@ class Phone extends Model
     }
 }
 $user = Phone::find(1)->user;
-
+------------------------------------------------------------------------------------------------------------------------
 // One to Many
 
 namespace App\Models;
@@ -88,11 +91,18 @@ class User extends Model
 }
 $phones = User::find(1)->phones;
 $users = User::with('phones')->get(); // жадная загрузка (избавляемся от N+1 проблемы)
-$users = User::withCount('phones')->get(); // подсчет количества связанных записей
+$users = User::withCount('phones')->get(); // подсчет количества связанных записей в поле phones_count
+$contacts = Contact::with('phoneNumbers', 'addresses')->get();
+$authors = Author::with('posts.comments')->get();
+$contacts = Contact::with(['addresses' => function ($query) {
+    $query->where('mailable', true);
+}])->get();
 
 // отключить lazy loading
 в boot методе App\Providers\AppServiceProvider
 Model::preventLazyLoading();
+
+Model::preventLazyLoading(! $this->app->isProduction());
 
 namespace App\Models;
 
@@ -108,7 +118,53 @@ class Phone extends Model
 }
 $user = Phone::find(1)->user;
 
+$donors = $user->contacts->filter(function ($contact) {
+    return $contact->status == 'donor';
+});
 
+$lifetimeValue = $contact->orders->reduce(function ($carry, $order) {
+    return $carry + $order->amount;
+}, 0);
+
+
+class User extends Model
+{
+    public function newestContact(): HasOne
+    {
+        return $this->hasOne(Contact::class)->latestOfMany();
+    }
+    public function oldestContact(): HasOne
+    {
+        return $this->hasOne(Contact::class)->oldestOfMany();
+    }
+    public function emergencyContact(): HasOne
+    {
+        return $this->hasOne(Contact::class)->ofMany('priority', 'max');
+    }
+}
+
+------------------------------------------------------------------------------------------------------------------------
+// сохранения через связь не many to many (связь добавится автоматически)
+The difference between save and create is
+that save accepts a full Eloquent model instance while create accepts a plain PHP array.
+
+$comment = new Comment(['message' => 'A new comment.']);
+$post = Post::find(1);
+
+$post->comments()->save($comment);
+$post->comments()->create([
+    'message' => 'A new comment.',
+]);
+
+$post->comments()->saveMany([
+    new Comment(['message' => 'A new comment.']),
+    new Comment(['message' => 'Another new comment.']),
+]);
+$post->comments()->createMany([
+    ['message' => 'A new comment.'],
+    ['message' => 'Another new comment.'],
+]);
+------------------------------------------------------------------------------------------------------------------------
 // Many to Many (m2m)
 relationship's table structure like so:
 
@@ -137,7 +193,9 @@ class User extends Model
         return $this->belongsToMany(Role::class);
         // By default, only the model keys will be present on the pivot model.
         // If your intermediate table contains extra attributes, you must specify them when defining the relationship:
-        // return $this->belongsToMany(Role::class)->withPivot('active', 'created_by');
+        // return $this->belongsToMany(Role::class)
+                ->withTimestamps() // created_at и updated_at
+                ->withPivot('active');
     }
 }
 $user = User::find(1);
@@ -145,6 +203,33 @@ foreach ($user->roles as $role) {
     // ...
 }
 $roles = User::find(1)->roles()->orderBy('name')->get();
+
+// Получение данных из сводной записи связанного элемента
+$user = User::first();
+$user->contacts->each(function ($contact) {
+    echo sprintf(
+        'Contact associated with this user at: %s',
+        $contact->pivot->created_at
+    );
+});
+
+// Настройка имени атрибута pivot
+// Модель User
+public function groups()
+{
+    return $this->belongsToMany(Group::class)
+        ->withTimestamps()
+        ->as('membership');
+}
+// Использование этого отношения:
+User::first()->groups->each(function ($group) {
+    echo sprintf(
+        'User joined this group at: %s',
+        $group->membership->created_at
+    );
+});
+
+
 
 namespace App\Models;
 
@@ -174,42 +259,55 @@ foreach ($user->roles as $role) {
     echo $role->pivot->created_at; // через pivot получаем дополнительные колонки
 }
 
+$user->roles->each(function ($role) {
+// сделать что-нибудь
+});
 
-
-
-// сохранения через связь не many to many (связь добавится автоматически)
-The difference between save and create is
-that save accepts a full Eloquent model instance while create accepts a plain PHP array.
-
-$comment = new Comment(['message' => 'A new comment.']);
-$post = Post::find(1);
-
-$post->comments()->save($comment);
-$post->comments()->create([
-    'message' => 'A new comment.',
-]);
-
-$post->comments()->saveMany([
-    new Comment(['message' => 'A new comment.']),
-    new Comment(['message' => 'Another new comment.']),
-]);
-$post->comments()->createMany([
-    ['message' => 'A new comment.'],
-    ['message' => 'Another new comment.'],
-]);
-
+$donors = $user->roles()->where('status', 'donor')->get();
 
 $post->refresh(); // обновляем
 // All comments, including the newly saved comment...
 $post->comments;
 
 
+------------------------------------------------------------------------------------------------------------------------
+Поскольку сводная таблица может иметь собственные свойства, нужна возможность установки этих свойств при присоединении элемента, связанного отношением «многие ко многим». Это можно сделать, передав массив во втором параметре в save():
+$user = User::first();
+$contact = Contact::first();
+$user->contacts()->save($contact, ['status' => 'donor']);
+Кроме того, вы можете использовать attach() и detach() и вместо экземпляра связанного элемента передать его идентификатор. Они работают так же, как save(), но могут принимать массив идентификаторов без необходимости переименовывать метод во что-то вроде attachMany():
+$user = User::first();
+$user->contacts()->attach(1);
+$user->contacts()->attach(2, ['status' => 'donor']);
+$user->contacts()->attach([1, 2, 3]);
+$user->contacts()->attach([
+    1 => ['status' => 'donor'],
+    2,
+    3,
+]);
+$user->contacts()->detach(1);
+$user->contacts()->detach([1, 2]);
+$user->contacts()->detach(); // Отсоединяет все контакты
+Если ваша цель не присоединение или отсоединение, а просто инвертирование текущего состояния связывания, используйте toggle(). Если данный идентификатор в данный момент присоединен, он будет отсоединен, и наоборот:
+$user->contacts()->toggle([1, 2, 3]);
+Вы также можете использовать updateExistingPivot(), чтобы изменить только сводную запись:
+$user->contacts()->updateExistingPivot($contactId, [
+    'status' => 'inactive',
+]);
+Если нужно заменить текущие отношения, эффективно отсоединив все предыдущие и добавив новые, передайте массив в sync():
+$user->contacts()->sync([1, 2, 3]);
+$user->contacts()->sync([
+    1 => ['status' => 'donor'],
+    2,
+    3,
+]);
 
-// прикрепление\отвязывание связи
+// прикрепление связи
 $account = Account::find(10);
 $user->account()->associate($account);
 $user->save();
 
+// отвязывание связи
 $user->account()->dissociate();
 $user->save();
 
@@ -236,7 +334,40 @@ $user->roles()->detach();
 
 
 $user->roles()->toggle([1, 2, 3]); // удаляем те которые уже есть в бд, и добавляем которых нет
+------------------------------------------------------------------------------------------------------------------------
+// Определение отношения «доступ ко многим через»
+class User extends Model
+{
+    public function phoneNumbers()
+    {
+        // Новый синтаксис на основе строк
+        return $this->through('contact')->has('phoneNumber');
 
+        // Традиционный синтаксис
+        return $this->hasManyThrough(PhoneNumber::class, Contact::class);
+    }
+}
+
+// Определение отношения «доступ к одному через»
+class User extends Model
+{
+    public function phoneNumber()
+    {
+        // Новый синтаксис на основе строк
+        return $this->through('company')->has('phoneNumber');
+
+        // Традиционный синтаксис
+        return $this->hasOneThrough(PhoneNumber::class, Company::class);
+    }
+}
+
+
+
+
+
+
+
+------------------------------------------------------------------------------------------------------------------------
 // выводит сводную информацию о модели
 model:show
 
@@ -342,6 +473,18 @@ class Contact extends Model
 }
 // Использование аксессора:
 $fullName = $contact->full_name;
+
+
+Если вы создали аксессор для несуществующего столбца — например, столбец full_name,
+добавьте его в массив $appends в модели, чтобы добавить его в массив и вывод JSON:
+class Contact extends Model
+{
+    protected $appends = ['full_name'];
+    public function getFullNameAttribute()
+    {
+        return "{$this->first_name} {$this->last_name}";
+    }
+}
 ------------------------------------------------------------------------------------------------------------------------
 // Мутаторы
 
@@ -435,9 +578,143 @@ protected $casts = [
     'ssn' => \App\Casts\Encrypted::class,
 ];
 ------------------------------------------------------------------------------------------------------------------------
-// Коллекции Eloquent
+// Полиморфные отношения
+class Star extends Model
+{
+    public function starrable()
+    {
+        return $this->morphTo();
+    }
+}
+class Contact extends Model
+{
+    public function stars()
+    {
+        return $this->morphMany(Star::class, 'starrable');
+    }
+}
+class Event extends Model
+{
+    public function stars()
+    {
+        return $this->morphMany(Star::class, 'starrable');
+    }
+}
 
+$contact = Contact::first();
+$contact->stars()->create();
 
+// Получение экземпляров полиморфного отношения
+$contact = Contact::first();
+$contact->stars->each(function ($star) {
+    // Делаем что-то
+});
+
+// Получение цели полиморфного экземпляра
+$stars = Star::all();
+$stars->each(function ($star) {
+    var_dump($star->starrable); // Экземпляр Contact или Event
+});
+
+// Расширение полиморфной системы для дифференциации по пользователям
+class Star extends Model
+{
+    public function starrable()
+    {
+        return $this->morphsTo;
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+}
+class User extends Model
+{
+    public function stars()
+    {
+        return $this->hasMany(Star::class);
+    }
+}
+$user = User::first();
+$event = Event::first();
+$event->stars()->create(['user_id' => $user->id]);
+
+// Полиморфное отношение «многие ко многим»
+class Contact extends Model
+{
+    public function tags()
+    {
+        return $this->morphToMany(Tag::class, 'taggable');
+    }
+}
+class Event extends Model
+{
+    public function tags()
+    {
+        return $this->morphToMany(Tag::class, 'taggable');
+    }
+}
+class Tag extends Model
+{
+    public function contacts()
+    {
+        return $this->morphedByMany(Contact::class, 'taggable');
+    }
+    public function events()
+    {
+        return $this->morphedByMany(Event::class, 'taggable');
+    }
+}
+$tag = Tag::firstOrCreate(['name' => 'likes-cheese']);
+$contact = Contact::first();
+$contact->tags()->attach($tag->id);
+
+// Доступ к связанным элементам с обеих сторон полиморфного отношения «многие ко многим»
+$contact = Contact::first();
+$contact->tags->each(function ($tag) {
+    // Делаем что-нибудь
+});
+$tag = Tag::first();
+$tag->contacts->each(function ($contact) {
+    // Делаем что-нибудь
+});
+------------------------------------------------------------------------------------------------------------------------
+// Синхронное обновление меток времени в родительских и дочерних записях
+// Обновление родительской записи при каждом обновлении дочерней записи
+class PhoneNumber extends Model
+{
+    protected $touches = ['contact'];
+
+    public function contact()
+    {
+        return $this->belongsTo(Contact::class);
+    }
+}
+
+------------------------------------------------------------------------------------------------------------------------
+// События, которые посылает каждая модель Eloquent:
+creating;
+created;
+updating;
+updated;
+saving;
+saved;
+deleting;
+deleted;
+restoring;
+restored;
+retrieved.
+// saving запускается как для creating и updating, а saved — для created и updated.
+------------------------------------------------------------------------------------------------------------------------
+// Проверка на принадлежность пользователя
+$model->user->is(Auth::user()) { // or isNot
+    do something
+}
+
+// Проверка на разрешение
+Auth::user->can('name from gate', $model) { // or cannot
+    do something
+}
 
 
 

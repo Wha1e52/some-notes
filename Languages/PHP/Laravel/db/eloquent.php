@@ -117,11 +117,6 @@ $contact->forceDelete();
 // или
 Contact::onlyTrashed()->forceDelete();
 ------------------------------------------------------------------------------------------------------------------------
-
-
-
-
-
 // firstWhere() — сокращенный вариант комбинации методов where() и first()
 // С помощью where() и first()
 Contact::where('name', 'Wilbur Powery')->first();
@@ -136,6 +131,31 @@ Contact::firstWhere('name', 'Wilbur Powery');
 $users = User::with('phones')->paginate(10); // пагинация по 10 записей
 $users = User::with('phones')->simplePaginate(10); // пагинация без вывода нумерации
 $users = User::with('phones')->cursorPaginate(10); // пагинация по курсору
+// Для управления количеством ссылок, отображаемых по обе стороны текущей страницы,
+можно использовать метод onEachSide():
+DB::table('posts')->paginate(10)->onEachSide(3);
+// Выведет: 5 6 7 [8] 9 10 11
+
+// Разбивка на страницы вручную
+use Illuminate\Http\Request;
+use Illuminate\Pagination\Paginator;
+Route::get('people', function (Request $request) {
+    $people = [...]; // огромный список персон
+    $perPage = 15;
+    $offsetPages = $request->input('page', 1) – 1;
+    // Класс Paginator не будет нарезать для вас ваш массив
+    $people = array_slice(
+        $people,
+        $offsetPages * $perPage,
+        $perPage
+    );
+    return new Paginator(
+        $people,
+        $perPage
+    );
+});
+
+в шаблоне используем метод links() для вывода пагинации {{ $users->links() }}
 
 // Разделение запроса Eloquent для ограничения использования памяти
 Contact::chunk(100, function ($contacts) {
@@ -144,11 +164,22 @@ Contact::chunk(100, function ($contacts) {
     }
 });
 
+// Выбор только записей со связанным элементом.
+$postsWithComments = Post::has('comments')->get();
+$postsWithManyComments = Post::has('comments', '>=', 5)->get();
+$usersWithPhoneBooks = User::has('contacts.phoneNumbers')->get();
 
-
-
-
-
+// Получает все контакты с номером телефона, содержащим строку "867-5309"
+$jennyIGotYourNumber = Contact::whereHas('phoneNumbers', function ($query) {
+    $query->where('number', 'like', '%867-5309%');
+})->get();
+// Сокращенная версия того же запроса
+$jennyIGotYourNumber = Contact::whereRelation(
+    'phoneNumbers',
+    'number',
+    'like',
+    '%867-5309'
+)->get();
 
 
 
