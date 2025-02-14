@@ -22,6 +22,8 @@ class Flight extends Model
     protected $guarded = ['id', 'created_at', 'updated_at', 'owner_id']; // запрещаем массово заполнять поля, если оставим пустым, то запрета не будет и можно убрать $fillable
     public $timestamps = false; // убираем поля created_at и updated_at
     protected $dateFormat = 'U'; // задаем формат даты для меток времени
+    protected $with = ['user']; // автоматически жадно загружаем связанный элемент
+    protected $dispatchesEvents = ['created' => ChirpCreated::class]; // отправляем событие после создания записи
 
 
     // кастомные методы для модели
@@ -60,6 +62,7 @@ $phone = User::find(1)->phone;
 
 $user = User::find(1);
 $user->phone()->where('id', '>', 1)->orderByDesc('id')->get()->toArray(); // можем дополнительно фильтровать и сортировать
+$user->phone->phone_number; // можем получить поля связанной модели
 
 namespace App\Models;
 
@@ -68,7 +71,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Phone extends Model
 {
-    public function user(): BelongsTo
+    public function user(): // если хотим указать другое название, в belongsTo нужно явно указать колонку fk т.к при user ларавель ищет user_id
     {
         return $this->belongsTo(User::class);
     }
@@ -335,7 +338,15 @@ $user->roles()->detach();
 
 $user->roles()->toggle([1, 2, 3]); // удаляем те которые уже есть в бд, и добавляем которых нет
 ------------------------------------------------------------------------------------------------------------------------
-// Определение отношения «доступ ко многим через»
+// отношения through
+к примеру нужны все посты написанные либералами(у affiliation есть своя таблица), но они никак не связаны с постами
+поэтому мы и получаем все посты ЧЕРЕЗ пользователя, который связан с постами
+$affiliation->posts
+тоже самое что и(только там 1 запрос с джоином):
+$user_ids = DB::select('select id from users where affiliation_id = :id', ['id' => 1]);
+$posts = DB::select('select * from posts where user_id in (:ids)', ['ids' => $user_ids]);
+
+// Определение отношения «has many through»
 class User extends Model
 {
     public function phoneNumbers()
@@ -348,7 +359,7 @@ class User extends Model
     }
 }
 
-// Определение отношения «доступ к одному через»
+// Определение отношения «has one through»
 class User extends Model
 {
     public function phoneNumber()
@@ -361,11 +372,115 @@ class User extends Model
     }
 }
 
+------------------------------------------------------------------------------------------------------------------------
+// Полиморфные отношения
+class Star extends Model
+{
+    public function starrable() // если нужно поменять имя, то в morphTo все равно явно указываем starrable, а тут называем как хотим
+    {
+        return $this->morphTo();
+    }
+}
+class Contact extends Model
+{
+    public function stars()
+    {
+        return $this->morphMany(Star::class, 'starrable');
+    }
+}
+class Event extends Model
+{
+    public function stars()
+    {
+        return $this->morphMany(Star::class, 'starrable');
+    }
+}
+
+$contact = Contact::first();
+$contact->stars()->create();
+
+// Получение экземпляров полиморфного отношения
+$contact = Contact::first();
+$contact->stars->each(function ($star) {
+    // Делаем что-то
+});
+
+// Получение цели полиморфного экземпляра
+$stars = Star::all();
+$stars->each(function ($star) {
+    var_dump($star->starrable); // Экземпляр Contact или Event
+});
+
+// Расширение полиморфной системы для дифференциации по пользователям
+class Star extends Model
+{
+    public function starrable()
+    {
+        return $this->morphsTo;
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+}
+class User extends Model
+{
+    public function stars()
+    {
+        return $this->hasMany(Star::class);
+    }
+}
+$user = User::first();
+$event = Event::first();
+$event->stars()->create(['user_id' => $user->id]);
 
 
 
+// Полиморфное отношение «многие ко многим»
+class Contact extends Model
+{
+    public function tags()
+    {
+        return $this->morphToMany(Tag::class, 'taggable');
+    }
+}
+class Event extends Model
+{
+    public function tags()
+    {
+        return $this->morphToMany(Tag::class, 'taggable');
+    }
+}
+class Tag extends Model
+{
+    public function contacts()
+    {
+        return $this->morphedByMany(Contact::class, 'taggable');
+    }
+    public function events()
+    {
+        return $this->morphedByMany(Event::class, 'taggable');
+    }
+}
+$tag = Tag::firstOrCreate(['name' => 'likes-cheese']);
+$contact = Contact::first();
+$contact->tags()->attach($tag->id);
 
+// Доступ к связанным элементам с обеих сторон полиморфного отношения «многие ко многим»
+$contact = Contact::first();
+$contact->tags->each(function ($tag) {
+    // Делаем что-нибудь
+});
+$tag = Tag::first();
+$tag->contacts->each(function ($contact) {
+    // Делаем что-нибудь
+});
 
+// если хочется сохранять в бд не имя класса с наймспейсом, то можно переопределить в провайдере в boot
+Relation::morphMap([
+    'contact' => Contact::class,
+    'event' => Event::class,
+]);
 
 ------------------------------------------------------------------------------------------------------------------------
 // выводит сводную информацию о модели
@@ -577,107 +692,6 @@ class Encrypted implements CastsAttributes
 protected $casts = [
     'ssn' => \App\Casts\Encrypted::class,
 ];
-------------------------------------------------------------------------------------------------------------------------
-// Полиморфные отношения
-class Star extends Model
-{
-    public function starrable()
-    {
-        return $this->morphTo();
-    }
-}
-class Contact extends Model
-{
-    public function stars()
-    {
-        return $this->morphMany(Star::class, 'starrable');
-    }
-}
-class Event extends Model
-{
-    public function stars()
-    {
-        return $this->morphMany(Star::class, 'starrable');
-    }
-}
-
-$contact = Contact::first();
-$contact->stars()->create();
-
-// Получение экземпляров полиморфного отношения
-$contact = Contact::first();
-$contact->stars->each(function ($star) {
-    // Делаем что-то
-});
-
-// Получение цели полиморфного экземпляра
-$stars = Star::all();
-$stars->each(function ($star) {
-    var_dump($star->starrable); // Экземпляр Contact или Event
-});
-
-// Расширение полиморфной системы для дифференциации по пользователям
-class Star extends Model
-{
-    public function starrable()
-    {
-        return $this->morphsTo;
-    }
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-}
-class User extends Model
-{
-    public function stars()
-    {
-        return $this->hasMany(Star::class);
-    }
-}
-$user = User::first();
-$event = Event::first();
-$event->stars()->create(['user_id' => $user->id]);
-
-// Полиморфное отношение «многие ко многим»
-class Contact extends Model
-{
-    public function tags()
-    {
-        return $this->morphToMany(Tag::class, 'taggable');
-    }
-}
-class Event extends Model
-{
-    public function tags()
-    {
-        return $this->morphToMany(Tag::class, 'taggable');
-    }
-}
-class Tag extends Model
-{
-    public function contacts()
-    {
-        return $this->morphedByMany(Contact::class, 'taggable');
-    }
-    public function events()
-    {
-        return $this->morphedByMany(Event::class, 'taggable');
-    }
-}
-$tag = Tag::firstOrCreate(['name' => 'likes-cheese']);
-$contact = Contact::first();
-$contact->tags()->attach($tag->id);
-
-// Доступ к связанным элементам с обеих сторон полиморфного отношения «многие ко многим»
-$contact = Contact::first();
-$contact->tags->each(function ($tag) {
-    // Делаем что-нибудь
-});
-$tag = Tag::first();
-$tag->contacts->each(function ($contact) {
-    // Делаем что-нибудь
-});
 ------------------------------------------------------------------------------------------------------------------------
 // Синхронное обновление меток времени в родительских и дочерних записях
 // Обновление родительской записи при каждом обновлении дочерней записи

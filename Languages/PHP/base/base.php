@@ -145,6 +145,7 @@ HERE;
 # match-case в питоне
 $a = 5;
 # не забудь break
+# слабое сравнение ==
 // если передадим функцию, то выполняется только 1 раз и потом только сравнивает результат
 switch ($a){
     case 1:
@@ -320,20 +321,13 @@ echo $firstName[1] = 'O'; # изменение байта по индексу
 
 <?php
 
-# тоже что и импорт в питоне, если файла нет будет предупреждение
+# тоже что и импорт в питоне, если файла нет - будет предупреждение
 include_once 'file_name.php';
 include 'file_name.php'; # можно импортировать множество раз
 
-# тоже что и импорт в питоне, если файла нет будет ошибка
+# тоже что и импорт в питоне, если файла нет - будет ошибка
 require_once 'file_name.php';
 require 'file_name.php'; # можно импортировать множество раз
-
-# включение содержимого файла в строку
-ob_start();
-include 'file_name.php';
-$res = ob_get_clean();
-$res = str_replace('some_text', 'another_text', $res);
-echo $res;
 
 # включение содержимого файла в переменную
 // file_name.php
@@ -342,6 +336,14 @@ echo $res;
 return 'some_text';
 */
 $some_var = require 'file_name.php'
+
+# включение содержимого файла в строку
+ob_start();
+include 'file_name.php';
+$res = ob_get_clean();
+$res = str_replace('some_text', 'another_text', $res);
+echo $res;
+
 ?>
 
 <?php
@@ -365,3 +367,65 @@ require 'vendor/autoload.php'; // подключить автозагрузку
 */
 
 ?>
+
+<?php
+/*
+
+return [something]; // в функции вернет значение, в скрипте остановит выполнение скрипта
+
+
+# declare - ticks // event that occurs for tickable low-level statements that executed by parser
+function onTick() {
+    echo 'tick <br />';
+}
+
+register_tick_function('onTick');
+declare(ticks=1); // how many tickable statements should pass before registered function runs
+$i = 1;
+$length = 10;
+while ($i < $length) {
+    echo $i++ . '<br />';
+}
+
+# declare - encoding
+
+# declare - strict_types // включает строгую типизацию
+declare(strict_types=1); // применяются ко всему что ниже
+
+
+
+*/
+
+
+?>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -17,7 +17,7 @@
     # some_type|some_type2|some_type3 - возвращаем some_type или some_type2 или some_type3
     # ?some_type - может возвращать some_type или null
 
-    function my_func(int $arg1, $arg2, $arg4 = 'default value', $arg3 = 2): void {
+    function my_func(int|float $arg1, $arg2, string $arg4 = 'default value', $arg3 = 2): void {
         echo "Hello World, $arg1, $arg2, $arg3, $arg4";
     }
 
@@ -28,7 +28,7 @@
         return $args;
     }
     $res = my_func2(1, 2, 3, 4, 5);
-    $some_arr = [4, 5, 1, 6];
+    $some_arr = [4, 5, 1, 6]; // если будет ассоциативный массив, то распаковка будет с именными аргументами, несмотря на порядок в массиве
     $res = my_func2(...$some_arr); # распаковка массива в аргументы функции
 
     $some_var = 1;

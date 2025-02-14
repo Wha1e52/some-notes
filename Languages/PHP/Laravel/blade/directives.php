@@ -175,11 +175,16 @@ Blade::directive('ifPublic', function () {
 // Подключение скриптов и стилей
 @vite(['resources/css/app.css'])
 
+// что-то там с локалью
+@lang()
 
+@lang('navigation.back')
+либо
+{{ __('navigation.back') }}
 
-
-
-
+@error('title')
+    <div class="alert alert-danger">{{ $message }}</div> // $message маг.переменная доступная только внутри @error
+@enderror
 
 
 

@@ -215,8 +215,11 @@ Route::get('posts/{post}/edit', [PostController::class, 'edit'])
 Route::get('posts/{post}/edit', [PostController::class, 'edit'])
     ->middleware('auth')
     ->can('namefromgate or policy', 'post');
-
-
-
+------------------------------------------------------------------------------------------------------------------------
+// Получение информации об URL из параметров маршрута
+Route::get('users/{id}', function ($id) {
+    // Если пользователь заходит на myapp.com/users/15/,
+    // переменной $id будет присвоено значение 15
+});
 
 */

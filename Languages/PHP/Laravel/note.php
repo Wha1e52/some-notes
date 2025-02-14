@@ -100,6 +100,99 @@ if (Gate::denies('update-post', $post)) {
 // собрать файлы для доставки в прод окружение или для локального тестирования
 npm run build / npm run dev
 Собранные файлы будут помещены в папку public/build/assets вместе с файлом public/build/manifest.json
+------------------------------------------------------------------------------------------------------------------------
+// Строковые вспомогательные функции и множественность
+Глобальные функции, str_ и array_, были удалены из Laravel версии 6 и перенесены в отдельный пакет laravel/helpers.
+При желании его можно установить с помощью Composer: composer require laravel/helpers.
+e() // Краткое обозначение для html_entities(). В целях безопасности экранирует все сущности HTML.
+
+Str::startsWith(), Str::endsWith(), Str::contains()
+Str::is()
+Str::slug()
+Str::plural(word, count), Str::singular()
+Str::camel(), Str::kebab(), Str::snake(), Str::studly(), Str::title()
+Str::after(), Str::before(), Str::limit()
+Str::markdown(string, options)
+Str::replace(search, replace, subject, caseSensitive)
+------------------------------------------------------------------------------------------------------------------------
+Задать локаль можно вызовом App::setLocale($localeName) и, скорее всего, вы поместите его в сервис-провайдер.
+В config/app.php есть специальный ключ fallback_locale, с помощью которого можно определить резервную локаль.
+Это язык по умолчанию для приложения, который Laravel будет использовать, если не найдет перевод для запрошенной локали
+
+// опубликовать файлы lang для модификации
+php artisan lang:publish
+
+Далее нужно создать файл lang/en/navigation.php, в котором будут определяться строки для перевода,
+связанные с навигацией, и заставить его возвращать массив PHP с указанным в нем ключом back (пример 6.10).
+<?php
+return [
+    'back' => 'Return to dashboard',
+];
+Теперь добавим перевод, для чего создадим каталог es в lang с собственным файлом navigation.php
+<?php
+return [
+    'back' => 'Volver al panel',
+];
+
+Использование перевода
+// routes/web.php
+Route::get('/es/contacts/show/{id}', function () {
+    // В этом примере локаль устанавливается вручную, а не в сервис-провайдере
+    App::setLocale('es');
+    return view('contacts.show');
+});
+// resources/views/contacts/show.blade.php
+<a href="/contacts">{{ __('navigation.back') }}</a>
+
+// lang/en/navigation.php
+return [
+'back' => 'Back to :section dashboard',
+];
+// resources/views/contacts/show.blade.php
+{{ __('navigation.back', ['section' => 'contacts']) }}
+
+// Определение простого перевода с поддержкой множественного числа
+// lang/en/messages.php
+return [
+'task-deletion' => 'You have deleted a task|You have successfully deleted tasks',
+];
+// resources/views/dashboard.blade.php
+@if ($numTasksDeleted > 0)
+{{ trans_choice('messages.task-deletion', $numTasksDeleted) }}
+@endif
+
+// Использование компонента Symfony Translation
+// lang/en/messages.php
+return [
+    'task-deletion' => "{0} You didn't manage to delete any tasks.|" .
+    "[1,4] You deleted a few tasks.|" .
+    "[5,Inf] You deleted a whole ton of tasks.",
+];
+
+// Использование JSON-переводов и функции __()
+// В Blade
+{{ __('View friends list') }}
+// lang/es.json
+{
+'View friends list': 'Ver lista de amigos'
+}
+------------------------------------------------------------------------------------------------------------------------
+// включить сервер дампа, который будет перехватывать обращения к dump() и отображать вывод в консоли вместо страницы.
+php artisan dump-server
+------------------------------------------------------------------------------------------------------------------------
+// объект PARAMETERBAG
+Используя фреймворк Laravel, вы иногда будете сталкиваться с объектом ParameterBag.
+Этот класс представляет собой нечто вроде ассоциативного массива.
+Вы можете получить значение определенного ключа с помощью метода get():
+echo $bag->get('name');
+Можно воспользоваться методом has() для проверки на наличие в массиве определенного ключа,
+all() для получения массива, содержащего все ключи и значения,
+count() для подсчета количества элементов и keys() для получения массива, содержащего только ключи.
+------------------------------------------------------------------------------------------------------------------------
+
+
+
+
 
 
 
