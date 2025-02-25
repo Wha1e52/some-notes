@@ -643,56 +643,6 @@ $browser->click('.search button');
 $browser->click('#search-button');
 // Вариант 2, рекомендуемый: синтаксис вида dusk="нужный-селектор"
 $browser->click('@expand-nav');
-
-
-
-
-
-
-
-------------------------------------------------------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ------------------------------------------------------------------------------------------------------------------------
 use RefreshDatabase; // Resetting the Database After Each Test (it will only execute the test within a database transaction.)
 
@@ -905,15 +855,136 @@ class TestCase extends \Illuminate\Foundation\Testing\TestCase
 При использовании Mockery обычно создается имитация, шпион или заглушка класса,
 затем этот объект привязывается к контейнеру вместо исходного класса.
 
+// Типичный шаблон тестирования API
+...
+class DogsApiTest extends TestCase
+{
+    use WithoutMiddleware, RefreshDatabase;
+    public function test_it_gets_all_dogs()
+    {
+        $dog1 = Dog::factory()->create();
+        $dog2 = Dog::factory()->create();
+        $response = $this->getJson('api/dogs');
+        $response->assertJsonFragment(['name' => $dog1->name]);
+        $response->assertJsonFragment(['name' => $dog2->name]);
+    }
+}
+------------------------------------------------------------------------------------------------------------------------
+// Создание поддельного объекта UploadedFile для целей тестирования
+public function test_file_should_be_stored()
+{
+    Storage::fake('public');
+    $file = UploadedFile::fake()->image('avatar.jpg');
+    $response = $this->postJson('/avatar', [
+        'avatar' => $file,
+    ]);
 
+    // Убеждаемся в том, что файл был сохранен
+    Storage::disk('public')->assertExists("avatars/{$file->hashName()}");
 
+    // Убеждаемся в том, что файл не существует
+    Storage::disk('public')->assertMissing('missing.jpg');
+}
 
+// Проверка отображения URL изображения
+public function test_user_profile_picture_echoes_correctly()
+{
+    $user = User::factory()->create();
+    $response = $this->get(route('users.show', $user->id));
+    $response->assertSee($user->picture);
+}
+------------------------------------------------------------------------------------------------------------------------
+Сессия
 
+public function test_some_thing()
+{
+    // Выполнение действий, дающих на выходе объект $response ...
+    $response->assertSessionHas('key', 'value');
+}
 
+$check = [
+    'has',
+    'hasWithThisValue' => 'thisValue',
+];
+$response->assertSessionHasAll($check);
 
+assertSessionMissing($key)
 
+$response = $this->post('test-route', ['failing' => 'data']);
+$response->assertSessionHasErrors(['name', 'email']);
 
+$response = $this->post('test-route', ['failing' => 'data']);
+$response->assertSessionHasErrors([
+    'email' => '<strong>The email field is required.</strong>',
+], '<strong>:message</strong>');
+------------------------------------------------------------------------------------------------------------------------
+Cookie-файлы
 
+// Выполнение модульных тестов в отношении cookie-файлов
+public function test_cookie()
+{
+    $this->app->resolving(EncryptCookies::class, function ($object) {
+        $object->disableFor('my-cookie');
+    });
 
+    $response = $this->call(
+        'get',
+        'route-echoing-my-cookie-value',
+        [],
+        ['my-cookie' => 'baz']
+    );
+    $response->assertSee('baz');
+}
+
+$response = $this->get('cookie-setting-route');
+$response->assertCookie('cookie-name');
+Методом assertPlainCookie() можно убедиться в наличии незашифрованного cookie-файла.
+------------------------------------------------------------------------------------------------------------------------
+// Использование утверждений фасада Log
+// Тестовый файл
+public function test_new_accounts_generate_log_entries()
+{
+    Log::shouldReceive('info')
+        ->once()
+        ->with('New account created!');
+
+    // Создание новой учетной записи
+    $this->post(route('accounts.store'), ['email' => 'matt@mattstauffer.com']);
+}
+
+// AccountsController
+public function store()
+{
+    // Создание учетной записи
+    Log::info('New account created!');
+}
+------------------------------------------------------------------------------------------------------------------------
+HTTP-клиент
+
+// Настройка ответов HTTP-клиентам по URL
+Http::fake([
+    // Вернуть JSON-ответ при обращении к конкретному API
+    'my-api.com/*' => Http::response(['key' => 'value'], 200, $headersArray),
+
+    // Вернуть строку при обращении ко всем другим конечным точкам
+    '*' => Http::response('This is a fake API response', 200, $headersArray),
+]);
+
+// Определение последовательности ответов от заданной конечной точки
+Http::fake([
+    // Вернуть последовательность ответов при вызове этого API
+    'my-api.com/*' => Http::sequence()
+        ->push('Initial string response', 200)
+        ->push(['secondary' => 'response'], 200)
+        ->pushStatus(404),
+]);
+
+// Проверка данных, отправляемых приложением
+Http::fake();
+Http::assertSent(function (Request $request) {
+    return $request->hasHeader('X-Custom-Header', 'certain-value') &&
+        $request->url() == 'http://my-api.com/users/2/comments' &&
+        $request['name'] == 'New User';
+});
 
 */

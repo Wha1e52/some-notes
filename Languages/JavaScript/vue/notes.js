@@ -15,6 +15,12 @@ const app = {
         changeAge(event) {
             this.age = event.target.value
         }
+    },
+    computed: {
+
+    },
+    watch: {
+
     }
 }
 const v = Vue.createApp(app)
@@ -25,46 +31,70 @@ v.mount('#app') // id в html, блок где будет рендериться
 не можем передавать в значения в атрибуты, для этого v-bind
 <h1>Hello {{ name }}</h1>
 <h1>Age {{ (age + 10) * 2 }}</h1> // возможны простые выражения
-
-// v-on: / @
-v-on:input="changeName" // (v-on) повесить событие, (:input) событие, (="changeName") функция отработки в methods
-@input="changeName"
-
-// v-bind / :
-<a v-bind:href="url">some link</a> // (v-bind) привязать значение к атрибуту, (:href) атрибут, (="url") переменная в data
-<a :href="url">some link</a>
-
-// v-html
-<h2 v-html="link"></h2> // (v-html) рендерим html, (="link") переменная в data
+можем внутри вызывать методы, если они возвращают строку
 
 // $event - если нужен ивент, можно передать
 <button v-on:click="increaseCounter(10, $event)">Увеличить</button>
 
-// v-model // two-way binding = (@input="inputValue = $event.target.value" :value="inputValue")
-есть еще модификатор (v-model.lazy) // изменения применятся после снятия фокуса
-<input type="text" v-model="inputValue">
-
-// условные директивы
-v-if="someCondition"
-v-else-if="someCondition"
-v-else="someCondition"
-
-v-show // не удаляет из dom, просто ставит display: none
-
-// цикл v-for
-<li v-for="person in people">{{ person }}</li>
-// В Vue.js разницы между in и of в v-for нет, оба работают одинаково
-<li v-for="(person, index) in people">{{ index + 1 }} {{ person }}</li>
-<li v-for="(person, index) of people">{{ index + 1 }} {{ person.name }}</li>
-<li v-for="(value, key, index) in people">{{ index }} <b>{{ key }}</b> {{ value }}</li>
-
-ref
-<h2 ref="heading">{{ title }}</h2>
+// ref
+<input ref="someName">
 ...
-this.$refs.heading
+в методе
+this.$refs.someName.value // можно достать значение
 
 // модификаторы (через точку)
 <input type="text" v-on:keypress.enter="someFunction">
+через .stop/prevent можно прекратить действие по умолчанию?
+
+// computed
+должны что-то возвращать (и в идеале зависеть от пременных в data)
+в шаблоне не вызываются напрямую вот так - someMethod(), используем без скобок как с переменными
+
+// watch
+следит за изменениями переменных
+название метода должно совпадать с именем переменной, принимает новое значение
+
+// динамическое изменение стилей
+<h1 :style="{
+    color: someVarInData.length > 10 ? 'red' : 'black',
+    fontSize: someVarInData.length < 10 ? '1em' : '2em'
+}">{{ title }}</h1>
+в качестве ключа - название свойства
+в качестве значения - условие
+если css свойство состоит из 2х и более слов - используем camelCase
+
+// динамическое изменение классов
+1
+<h1 :class="someVarInData.length > 10 ? 'primary' : 'bold">{{ title }}</h1>
+
+2
+<h1 :class="{
+    'primary': someVarInData.length > 10,
+    'bold': someVarInData.length < 10
+}">{{ title }}</h1>
+в качестве ключа - название класса
+в качестве значения - условие
+
+3
+<h1 :class="['bold', {'primary': someVarInData.length > 10}]">{{ title }}</h1>
+простой элемент - добавляет класс всегда и без условий
+объект с ключом и условием работает как в примере 2
+
+// фильтрацию по массивам лучше сделать через computed и уже в цикле использовать этот метод
+
+// несколько методов на событие
+<button @click="someFunction, someFunction2">Click</button>
+
+
+
+
+
+
+
+
+
+
+
 
 
 

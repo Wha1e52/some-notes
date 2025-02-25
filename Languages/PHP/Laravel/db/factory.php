@@ -55,5 +55,16 @@ $trip = Trip::factory()
     ->recycle($user)
     ->create();
 
-
+// Возврат «поддельных» файлов с помощью Faker
+public function definition ()
+{
+    return [
+        'picture' => $faker->file(
+            base_path('tests/stubs/images'), // Исходный каталог
+            storage_path('app'), // Целевой каталог
+            false, // Возвращаем только имя файла, а не полный путь
+        ),
+        'name' => $faker->name,
+    ];
+}
 */
