@@ -6,29 +6,90 @@
 
 </head>
 <body>
+
+<style>
+    .multiselect-container {
+        display: flex; /* Располагает элементы в строку */
+        align-items: center; /* Выравнивает кнопку и селект по центру */
+        gap: 8px; /* Отступ между селектом и кнопкой */
+        width: fit-content;
+        min-width: 400px;
+    }
+
+    /* Кнопка очистки */
+    .clear-btn {
+        background: none;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 18px;
+        cursor: pointer;
+        padding: 2px 8px;
+        color: #888;
+        transition: 0.3s;
+    }
+
+    .clear-btn:hover {
+        color: #000;
+        border-color: #000;
+    }
+
+    .select-all-btn {
+        background: none;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 16px;
+        cursor: pointer;
+        padding: 4px 8px;
+        color: #888;
+        transition: 0.3s;
+    }
+
+    .select-all-btn:hover {
+        color: #000;
+        border-color: #000;
+    }
+</style>
 <div id="app">
-<!--    <input type="text" v-on:input="changeName">-->
-<!--    <h1>Hello {{ name }}</h1>-->
-<!--    <a v-bind:href="url">some link</a>-->
-<!--    <h2 v-html="link"></h2>-->
+    <!--    <input type="text" v-on:input="changeName">-->
+    <!--    <h1>Hello {{ name }}</h1>-->
+    <!--    <a v-bind:href="url">some link</a>-->
+    <!--    <h2 v-html="link"></h2>-->
+    <div class="multiselect-container">
+        <multiselect
+                v-model="value"
+                :options="options"
+                :multiple="true"
+                placeholder="- Search or add a tag - "
+                label="name"
+                track-by="code"></multiselect>
+        <button v-if="value.length" class="clear-btn" @click="value = []">×</button>
+        <button type="button" class="select-all-btn" @click="selectAll()">Выбрать все</button>
+
+    </div>
 
     <h1>Counter: {{ counter2 }}</h1>
-<!--    <button @click="increaseCounter(10, $event)">Увеличить</button>-->
+    <!--    <button @click="increaseCounter(10, $event)">Увеличить</button>-->
 
-<!--    <h1 v-on="{'mouseover': onHover, 'mouseleave': outHover}">Counter2: {{ counter2 }}</h1>-->
+    <!--    <h1 v-on="{'mouseover': onHover, 'mouseleave': outHover}">Counter2: {{ counter2 }}</h1>-->
     <button v-on:click="counter2++">Увеличить</button>
 
-<!--    <hr>-->
+    <!--    <hr>-->
 
-<!--    <input type="text" v-model="name2">-->
-<!--    <h1>Hello {{ name2 }}</h1>-->
+    <!--    <input type="text" v-model="name2">-->
+    <!--    <h1>Hello {{ name2 }}</h1>-->
     <ul>
         <li v-for="person in people">{{ person }}</li>
     </ul>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/vue@2.7.16/dist/vue.js"></script>
+<script src="https://unpkg.com/vue-multiselect@2.1.6"></script>
+<link rel="stylesheet" href="https://unpkg.com/vue-multiselect@2.1.6/dist/vue-multiselect.min.css">
 <script>
+
     new Vue({
+        components: {
+            multiselect: window.VueMultiselect.default
+        },
         el: '#app', // обязательное свойство корневого элемента
         data: {
             // name: 'Vue',
@@ -38,6 +99,26 @@
             // counter: 0,
             counter2: 0,
             people: ['John', 'Jane', 'Joe'],
+            value: [
+                {name: 'Vue.js', code: 'йцу'},
+                {name: 'Javascript', code: 'цц'},
+                {name: 'Open Source', code: 'цц1'},
+                {name: 'Open Source2', code: 'ыфв'},
+                {name: 'Open Source3', code: 'авпп'},
+                {name: 'Open Source4', code: 'фывфв'},
+                {name: 'Open Source5', code: 'oясячсs5'},
+                {name: 'Open Source6', code: 'ммя'},
+            ],
+            options: [
+                {name: 'Vue.js', code: 'йцу'},
+                {name: 'Javascript', code: 'цц'},
+                {name: 'Open Source', code: 'цц1'},
+                {name: 'Open Source2', code: 'ыфв'},
+                {name: 'Open Source3', code: 'авпп'},
+                {name: 'Open Source4', code: 'фывфв'},
+                {name: 'Open Source5', code: 'oясячсs5'},
+                {name: 'Open Source6', code: 'ммя'},
+            ]
         },
         computed: {
             // для методов что возвращают объекты втф?
@@ -56,7 +137,10 @@
             },
             outHover: function (event) {
                 event.target.style.color = 'black'
-            }
+            },
+            selectAll() {
+                this.value = this.options.map(option => option);
+            },
         },
         watch: {
             counter2: function (newVal, oldVal) {

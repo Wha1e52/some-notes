@@ -121,7 +121,7 @@ echo $x ^ $y; # xor (if only one bit is 1, but not both)
 echo ~$x; # invert bits
 // 110
 // ~
-// 011
+// 001
 
 echo $x << 2; # left shift
 echo $x >> 2; # right shift

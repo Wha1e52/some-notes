@@ -986,5 +986,80 @@ Http::assertSent(function (Request $request) {
         $request->url() == 'http://my-api.com/users/2/comments' &&
         $request['name'] == 'New User';
 });
+------------------------------------------------------------------------------------------------------------------------
+// Проверка на предмет того, были ли отправлены уведомления
+public function test_new_signups_triggers_admin_notification()
+{
+    Notification::fake();
+    Notification::assertSentTo($user, NewUsersSignedup::class,
+        function ($notification, $channels) {
+            return $notification->user->email == 'user-who-signed-up@gmail.com' && $channels == ['mail'];
+        });
+    // Убеждаемся в том, что электронное письмо было отправлено указанному пользователю
+    Notification::assertSentTo(
+        [$user],
+        NewUsersSignedup::class
+    );
+    // Также можно использовать метод assertNotSentTo()
+    Notification::assertNotSentTo(
+        [$userDidntSignUp], NewUsersSignedup::class
+    );
+}
+------------------------------------------------------------------------------------------------------------------------
+// Использование замыкания для проверки отправленного задания на предмет соответствия заданным критериям
+use Illuminate\Support\Facades\Bus;
+...
+public function test_changing_subscriptions_triggers_crunch_job()
+{
+    ...
+    Bus::fake();
+    Bus::assertDispatched(CrunchReports::class, function ($job) {
+        return $job->subscriptions->contains(5);
+    });
+    // Или можно использовать метод assertNotDispatched()
+}
+
+// Кроме того, можно воспользоваться методами AssertPushedWithChain() и AssertPushedWithoutChain().
+Bus::fake();
+Bus::assertPushedWithChain(
+    CrunchReports::class,
+    [ChainedJob::class],
+    function ($job) {
+        return $job->subscriptions->contains(5);
+    }
+);
+
+// Можно также использовать assertPushedWithoutChain()
+Bus::assertPushedWithChain(CrunchReports::class, function ($job) {
+    return $job->subscriptions->contains(5);
+});
+
+// Использование замыкания для проверки запущенного события на предмет соответствия заданным критериям
+use Illuminate\Support\Facades\Event;
+...
+public function test_usersubscribed_event_fires()
+{
+    Event::fake();
+    // ...
+    Event::assertDispatched(UserSubscribed::class, function ($e) {
+        return $e->user->email = 'user-who-subscribed@mail.com';
+    });
+    // Также можно использовать метод assertNotDispatched()
+}
+
+// Отключение прослушивателей событий на время тестирования
+public function test_something_subscription_related()
+{
+    $this->withoutEvents();
+    // ...
+}
+
+
+
+
+
+
+
+
 
 */
