@@ -2,11 +2,48 @@
 
 // создание приложения
 const app = {
+    props: ['someAttribute'], // массив параметров которые ожидаем. Дальше атрибут добавляется в data и доступен через this.
+    props: { // в виде объекта с валидацией
+        modelValue: String, // зарезервированное имя для получения модели(v-model) // можно получать кастомное имя через v-model:name=...
+        someAttribute: {
+            type: String,
+            required: true,
+            default: 'some default value',
+            validator(value) {
+                return value.length > 5 // возвращаем true or false
+            }
+        },
+        someAttribute2: Number,
+        someAttribute3: Boolean,
+    },
+    emits: ['some-event', 'some-event2'], // массив событий которые эмитим наверх (для других разработчиков)
+    emits: { // в виде объекта с валидацией
+        'some-event'(num) {
+            if (num > 10) {
+                return true
+            }
+            console.warn(no data in some-event emit)
+            return false
+        },
+        'some-event2': null,
+    },
+    provide() { // шарим данные в другие компоненты
+        return {
+            someKey: 'some value',
+            someKey2: 'some value',
+        }
+    },
+    inject: ['someKey'] // вытаскиваем данные данные из provide (в других компонентах)
     data() {
         return {
             name: 'John'
             age: 18
         }
+    },
+    components: {
+      'some-component': someComponent(импортнутый) // локальная регистрация
+      someComponent: someComponent // либо
+      someComponent // либо
     },
     methods: {
         changeName() {
@@ -45,6 +82,9 @@ this.$refs.someName.value // можно достать значение
 // модификаторы (через точку)
 <input type="text" v-on:keypress.enter="someFunction">
 через .stop/prevent можно прекратить действие по умолчанию?
+v-model.trim="someName" // сама обрежет пробелы в данных
+v-model.number="someName" // приведение к числу
+submit.prevent
 
 // computed
 должны что-то возвращать (и в идеале зависеть от пременных в data)
@@ -85,22 +125,54 @@ this.$refs.someName.value // можно достать значение
 // несколько методов на событие
 <button @click="someFunction, someFunction2">Click</button>
 
+// props свойство которое можем шарить между компонентами
 
+// this.$emit('some-action', someData, someData2) вызываем в каком-нибудь методе (передаем в родительский компонент)
+@some-action="someFunction" слушаем в родительском компоненте
+someFunction(data, data2) {
+ // do something
+ console.log(data) // те someData
+}
 
+// <slot /> пишем в шаблоне компонента для получения данных из тега
+// может быть именным name="someName" и чтобы передавать в именной нужно обернуть в тег <template v-slot:someName><h1>123</h1></template>
+<some-component>TEXT</some-component> // в родительском компоненте
+<some-component>
+    <template v-slot:someName>
+        <h1>123</h1>
+    </template>
+</some-component>
 
+<button> // в компоненте
+    <slot /> // TEXT
+</button>
 
+// $slots - хранит переданные слоты
+// если в компоненте у слота забиндить данные <slot :name1="1" :name2="2" />, то в родительском можно иъ достать
+<template #default="{ name1, name2 }">
+    <h1>123</h1>
+</template>
 
+// <style scoped> // scoped добавляет стили только к данному компоненту
 
+// динамические компоненты
+<component :is="'componentName'"></component>
+имя будет удобно высчитывать в computed и сюда подставлять
 
+// <keep-alive></keep-alive> // сохраняет состояние компонента и не перерисовывает его
+<keep-alive>
+    <component :is="'componentName'"></component>
+</keep-alive>
 
-
-
-
-
-
-
-
-
+// расширенный функционал computed (по-умолчанию обычные ф-ции это гетеры)
+someName: {
+    get() {
+        return ''
+    },
+    set(value) {
+        console.log(value)
+    }
+}
 
 
 

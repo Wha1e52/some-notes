@@ -12,8 +12,8 @@ loglevel debug
 # Указывает место куда выводить лог
 logfile ./redis.log
 
-# устанавливает аутентификацию. lectrum ← пароль.
-requirepass lectrum
+# устанавливает аутентификацию. password ← пароль.
+requirepass password
 
 # Переименовывает команду
 rename-command config hiddenconfig

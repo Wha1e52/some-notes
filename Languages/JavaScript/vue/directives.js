@@ -47,7 +47,11 @@ v-show // не удаляет из dom, просто ставит display: none
     }
 </style>
 
-
-
+// v-slot / #
+<some-component>
+    <template v-slot:someName>
+        <h1>123</h1>
+    </template>
+</some-component>
 
  */
