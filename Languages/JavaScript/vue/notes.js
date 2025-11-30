@@ -70,6 +70,9 @@ v.mount('#app') // id в html, блок где будет рендериться
 <h1>Age {{ (age + 10) * 2 }}</h1> // возможны простые выражения
 можем внутри вызывать методы, если они возвращают строку
 
+v-text - альтернатива
+<h1 v-text="name"></h1>
+
 // $event - если нужен ивент, можно передать
 <button v-on:click="increaseCounter(10, $event)">Увеличить</button>
 
@@ -87,7 +90,7 @@ v-model.number="someName" // приведение к числу
 submit.prevent
 
 // computed
-должны что-то возвращать (и в идеале зависеть от пременных в data)
+должны что-то возвращать (и в идеале зависеть от переменных в data)
 в шаблоне не вызываются напрямую вот так - someMethod(), используем без скобок как с переменными
 
 // watch
@@ -134,6 +137,8 @@ someFunction(data, data2) {
  console.log(data) // те someData
 }
 
+// v-slot / #
+
 // <slot /> пишем в шаблоне компонента для получения данных из тега
 // может быть именным name="someName" и чтобы передавать в именной нужно обернуть в тег <template v-slot:someName><h1>123</h1></template>
 <some-component>TEXT</some-component> // в родительском компоненте
@@ -148,10 +153,13 @@ someFunction(data, data2) {
 </button>
 
 // $slots - хранит переданные слоты
+можно поставить условие типа v-if="$slots.someSlotName"
 // если в компоненте у слота забиндить данные <slot :name1="1" :name2="2" />, то в родительском можно иъ достать
 <template #default="{ name1, name2 }">
     <h1>123</h1>
 </template>
+
+
 
 // <style scoped> // scoped добавляет стили только к данному компоненту
 
@@ -173,6 +181,64 @@ someName: {
         console.log(value)
     }
 }
+
+// v-model на кастомных компонентах
+modelValue - зарезервированный проп для получения значения внутри компонента на котором висит v-model
+update:modelValue - для эмита
+defineProps({
+    modelValue: {
+        type: String,
+        default: ''
+    }
+})
+defineEmits(['update:modelValue'])
+можно поменять на что-то другое в родительском компоненте через v-model:anotherName
+и принимаем в пропсах тогда anotherName вместо modelValue, эмитим тоже update:anotherName
+
+
+// composables
+это функция, которую ты создаёшь в Vue 3, чтобы повторно использовать логику в разных компонентах. часть Composition API.
+composables/useCounter.ts
+import { ref } from 'vue'
+export function useCounter(initial = 0) {
+  const count = ref(initial)
+
+  function increment() {
+    count.value++
+  }
+
+  function decrement() {
+    count.value--
+  }
+
+  return {
+    count,
+    increment,
+    decrement
+  }
+}
+
+components/Counter.vue
+<script setup lang="ts">
+import { useCounter } from '@/composables/useCounter'
+const { count, increment, decrement } = useCounter(5) // стартовое значение 5
+</script>
+
+//provide/inject
+расшариваем данные между компонентами, чтобы не передавать через props на несколько уровней
+import { provide, inject } from 'vue'
+provide('someKey', 'someValue') // шарим в родительском компоненте
+const someValue = inject('someKey') // получаем в дочернем компоненте
+
+
+
+
+
+
+
+
+
+
 
 
 

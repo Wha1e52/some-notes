@@ -1,7 +1,7 @@
 <?php
 
 // Constructor Property Promotion
-class User {
+class User { // название класса - Существительные
     public function __construct(public $name, public $email) {}
 }
 
@@ -40,18 +40,78 @@ static::class:
     Когда вы хотите поддерживать полиморфизм и учитывать, какой класс вызвал метод.
     Для методов или свойств, которые должны "реагировать" на наследование.
 */
+________________________________________________________________________________________________________________________
 
+// названия методов давать так: скажи вслух что он должен делать ? берем глагол
+________________________________________________________________________________________________________________________
 
+// Интерфейсы
 
+interface SomeInterface {
+    public function someMethod($param1, $param2);
+}
 
+class SomeClass implements SomeInterface {
+    public function someMethod($param1, $param2) {
+        // ...
+    }
+}
 
+class SomeClass2 implements SomeInterface {
+    public function someMethod($param1, $param2) {
+        // ...
+    }
+}
 
+class MainClass {
+    public function __construct(public SomeInterface $service) {}
 
+    public function mainMethod(...) {
+        // ...
+        $this->service->someMethod($param1, $param2);
+        // ...
+    }
+}
 
+$mainClass = new MainClass(new SomeClass2());
 
+________________________________________________________________________________________________________________________
 
+// Абстрактные классы
 
+abstract class AbstractPayment {
+    public function process(float $amount): void {
+        try {
+            $this->logStart($amount);
+            $this->pay($amount);
+            $this->logSuccess();
+        } catch (\Throwable $e) {
+            $this->logFailure($e);
+        }
+    }
 
+    abstract protected function pay(float $amount): void;
+
+    protected function logStart(float $amount): void {
+        Log::info("Starting payment of $amount");
+    }
+
+    protected function logSuccess(): void {
+        Log::info("Payment successful");
+    }
+
+    protected function logFailure(\Throwable $e): void {
+        Log::error("Payment failed: " . $e->getMessage());
+    }
+}
+
+class StripePayment extends AbstractPayment {
+    protected function pay(float $amount): void {
+        // Stripe API logic
+    }
+}
+
+________________________________________________________________________________________________________________________
 
 
 

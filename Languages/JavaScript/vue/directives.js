@@ -37,7 +37,7 @@ v-show // не удаляет из dom, просто ставит display: none
 <li v-for="(person, index) in people">{{ index + 1 }} {{ person }}</li>
 <li v-for="(person, index) of people">{{ index + 1 }} {{ person.name }}</li>
 <li v-for="(value, key, index) in people">{{ index }} <b>{{ key }}</b> {{ value }}</li>
-для циклов нужно использовать v-bind:key для уникальности идентификаторов
+! для циклов нужно использовать v-bind:key для уникальности идентификаторов !
 
 // v-clock
 <div v-clock>
