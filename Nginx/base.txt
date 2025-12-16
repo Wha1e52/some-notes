@@ -1,0 +1,73 @@
+
+Contexts - разделы в конфигурации, в которых могут использоваться директивы (events, http, server, location...)
+
+Directives - конкретные опции конфигурации, которые указаны в конфигурации (listen, server_name, root...)
+и состоят из имени и значения
+
+service nginx start - запуск сервиса
+service nginx stop - остановка сервиса
+service nginx reload - перезагрузка конфигурации
+service nginx restart - перезапуск сервиса
+
+порядок совпадения location:
+1) = полное совпадение
+2) ^~ префикс преимущества
+3) ~&*~ регулярное выражения
+4) совпадение префикса без модификатора
+
+#nginx.conf
+events {}
+
+http {
+
+    include /etc/nginx/mime.types; - подключаем уже определенные MIME-типы вместо прописывания вручную в types
+
+    types { - определение MIME-типов
+        text/html html; - будет применен ко всем файлам html
+        text/css css; - будет применен ко всем файлам css
+    }
+
+    server { - связан с 1 хостом, доменом, под-доменом или IP-адресом
+
+        listen 80; - прослушиваем порт 80
+
+        server_name name; - имя сервера, домена, под-домена или IP для которого настраивается конфигурация
+
+        root /sites/bootstrap; - путь к корневому каталогу
+
+        # в location указываем поведение при посещении определенных uri:
+
+        # сопоставление префикса, отработает даже если будет /greetings, greet123...
+        location /greet {
+            return 200 'Hello World!';
+        }
+
+        # полное совпадение
+        location = /greet {
+            return 200 'Hello World!';
+        }
+
+        # по регулярному выражению, case sensitive
+        location ~ /greet[0-9] {
+            return 200 'Hello World case sensitive!';
+        }
+
+        # по регулярному выражению, case insensitive
+        location *~ /greet[0-9] {
+            return 200 'Hello World! case insensitive';
+        }
+
+        # ведет себя как стандартный префикс, но с большим приоритетом чем регулярки, если у них один uri
+        location ^~ /greet {
+            return 200 'Hello World!';
+        }
+
+        # $uri - переменная, которая содержит uri
+        location /downloads {
+            root /sites; - путь к корневому каталогу, ищем в этой корневой папке
+            try_files $uri =404; - сначала пытаемся открыть как есть, если не получается, то возвращаем 404
+        }
+
+    }
+
+}

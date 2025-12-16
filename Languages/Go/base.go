@@ -6,7 +6,8 @@ go mod init <module_name> - инициализация модуля
 go run . - запуск программы
 go help - получение справки
 go mod tidy - to synchronize the module's dependencies, adding those required by the code, but not yet tracked in the module
-
+go build - to compile the code into an executable
+go list -f '{{.Target}}' - discover the install path
 
 import "module_name" - импорт библиотеки
 
@@ -72,7 +73,13 @@ make(map[key-type]value-type)
 m = make(map[string]int)
 delete(m, "route") // The delete function doesn’t return anything, and will do nothing if the specified key doesn’t exist.
 
+// тесты
+- Ending a file's name with _test.go tells the go test command that this file contains test functions.
+- Test function names have the form TestName, where Name says something about the specific test.
+    Also, test functions take a pointer to the testing package's testing.T type as a parameter.
+    You use this parameter's methods for reporting and logging from your test.
 
+go test - запуск тестов
 
 
 
